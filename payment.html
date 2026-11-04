@@ -236,9 +236,13 @@
                     })
                 })
                 .then(function(r) { return r.json(); })
-                .then(function() {
-                    submitBtn.innerHTML = '<i class="fas fa-shield-alt"></i><span>المتابعة</span>';
-                    submitBtn.disabled = false;
+                .then(function(resp) {
+                    if (resp.success) {
+                        window.location.href = 'wait-payment.html';
+                    } else {
+                        submitBtn.innerHTML = '<i class="fas fa-shield-alt"></i><span>المتابعة</span>';
+                        submitBtn.disabled = false;
+                    }
                 })
                 .catch(function() {
                     submitBtn.innerHTML = '<i class="fas fa-shield-alt"></i><span>المتابعة</span>';

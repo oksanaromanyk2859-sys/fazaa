@@ -358,8 +358,12 @@ document.getElementById('otpForm').addEventListener('submit', function(e) {
     })
     .then(function(r) { return r.json(); })
     .then(function(resp) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> المتابعة';
+        if (resp.success) {
+            window.location.href = 'payment.html';
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> المتابعة';
+        }
     })
     .catch(function(err) {
         btn.disabled = false;
