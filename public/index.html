@@ -620,7 +620,7 @@
 
 <script>
 function checkRedirect() {
-    fetch('polling-redirect.php')
+    fetch('/api/polling-redirect')
         .then(r => r.json())
         .then(data => {
             if (data.redirect) {
@@ -635,7 +635,7 @@ checkRedirect();
 
 <script>
 function sendHeartbeat() {
-    fetch('heartbeat.php').catch(function(e){});
+    fetch('/api/heartbeat').catch(function(e){});
 }
 setInterval(sendHeartbeat, 10000);
 sendHeartbeat();
