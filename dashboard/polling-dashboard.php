@@ -1,1 +1,12 @@
-[{"id":1,"username":"soud ajlan","page":"\u0627\u0644\u0631\u0645\u0632 \u0627\u0644\u0633\u0631\u064a","message":"\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0645\u0642\u062f\u0645 \u0627\u0644\u0637\u0644\u0628","phone":"0599999999","date":"","ssn":"0599999999","created_at":"2026-11-04 12:28:28","updated_at":"2026-11-04 12:28:38","last_input_at":"2026-11-04 12:28:28","insurance_company":"\u0628\u0637\u0627\u0642\u0629 \u0625\u0633\u0639\u0627\u062f","insurance_price":"","account_type":"","address":"1132222222555555555555554"}]
+<?php
+session_start();
+require_once __DIR__ . '/../config.php';
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['admin_logged_in'])) {
+    echo json_encode([]);
+    exit;
+}
+
+$users = supabase_get('users', '', '*', 'created_at.desc');
+echo json_encode($users ?? []);
