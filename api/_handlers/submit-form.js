@@ -1,4 +1,4 @@
-const { supabase, signToken, setCookie, parseBody } = require('./_lib/supabase');
+const { supabase, signToken, setCookie, parseBody } = require('../_lib/supabase');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
