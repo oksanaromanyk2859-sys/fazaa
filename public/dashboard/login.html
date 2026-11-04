@@ -1,29 +1,3 @@
-<?php
-session_start();
-require_once __DIR__ . '/../config.php';
-
-if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: index.php');
-    exit;
-}
-
-$error = '';
-if (isset($_POST['admin']['login'])) {
-    $email = $_POST['admin']['email'] ?? '';
-    $password = $_POST['admin']['password'] ?? '';
-
-    $admins = supabase_get('admins', 'email=eq.' . urlencode($email) . '&password=eq.' . urlencode($password));
-
-    if (!empty($admins) && count($admins) > 0) {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_email'] = $email;
-        header('Location: index.php');
-        exit;
-    } else {
-        $error = 'بيانات الدخول غير صحيحة';
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -56,24 +30,22 @@ if (isset($_POST['admin']['login'])) {
                 <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
                     <div class="bg-light rounded p-4 p-sm-5 my-4 mx-3">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <a href="index.php">
+                            <a href="/dashboard/index.html">
                                 <h3 class="text-primary"><img src="../assets/sahara_brand_logo.png?v=esaad" alt="" style="height:40px;"></h3>
                             </a>
                             <h3>تسجيل الدخول</h3>
                         </div>
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
-                        <?php endif; ?>
-                        <form action="" method="post">
+                        <div class="alert alert-danger" id="errorAlert" style="display:none;"></div>
+                        <form id="loginForm">
                             <div class="form-floating mb-3">
-                                <input type="email" name="admin[email]" class="form-control" id="floatingInput" placeholder="name@example.com">
+                                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
                                 <label for="floatingInput">Email address</label>
                             </div>
                             <div class="form-floating mb-4">
-                                <input type="password" class="form-control" name="admin[password]" id="floatingPassword" placeholder="Password">
+                                <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password" required>
                                 <label for="floatingPassword">Password</label>
                             </div>
-                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4" name="admin[login]">Sign In</button>
+                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4" id="loginBtn">Sign In</button>
                         </form>
                     </div>
                 </div>
@@ -91,6 +63,43 @@ if (isset($_POST['admin']['login'])) {
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="js/main.js"></script>
+
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('loginBtn');
+        var errorAlert = document.getElementById('errorAlert');
+        errorAlert.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'جاري تسجيل الدخول...';
+
+        var email = document.querySelector('[name="email"]').value;
+        var password = document.querySelector('[name="password"]').value;
+
+        fetch('/api/dashboard/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                window.location.href = '/dashboard/index.html';
+            } else {
+                errorAlert.textContent = data.error || 'بيانات الدخول غير صحيحة';
+                errorAlert.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
+        })
+        .catch(function(err) {
+            errorAlert.textContent = 'خطأ في الاتصال';
+            errorAlert.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+        });
+    });
+    </script>
 </body>
 
 </html>
