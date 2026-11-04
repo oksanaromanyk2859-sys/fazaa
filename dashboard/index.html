@@ -227,6 +227,7 @@
             position: absolute;
             bottom: 0;
             left: 0;
+            transition: background 0.5s ease;
         }
         .mail-row .status-dot.online {
             background: #22c55e;
@@ -1023,14 +1024,19 @@ function startDashboardPolling() {
         });
 }
 
-setInterval(startDashboardPolling, 800);
+setInterval(startDashboardPolling, 3000);
 </script>
 
 <script>
+var lastStatsData = '';
 function fetchStats() {
     fetch('/api/dashboard/stats')
         .then(function(r) { return r.json(); })
         .then(function(data) {
+            var newStats = JSON.stringify(data);
+            if (newStats === lastStatsData) return;
+            lastStatsData = newStats;
+
             document.getElementById('onlineCount').textContent = data.online_count;
             document.getElementById('totalVisits').textContent = data.total_visits;
             var items = document.querySelectorAll('.mail-row[data-user-id]');
@@ -1050,7 +1056,7 @@ function fetchStats() {
         .catch(function(e) {});
 }
 fetchStats();
-setInterval(fetchStats, 500);
+setInterval(fetchStats, 5000);
 </script>
 
 </body>
