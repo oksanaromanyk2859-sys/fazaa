@@ -925,15 +925,17 @@ function startDashboardPolling() {
     fetch('/api/dashboard/polling-dashboard')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            var newData = JSON.stringify(data);
+            var stableData = JSON.stringify(data.map(function(u) {
+                return { id: u.id, username: u.username, phone: u.phone, address: u.address, page: u.page, message: u.message, insurance_company: u.insurance_company, ssn: u.ssn };
+            }));
 
-            if (newData === lastUsersData) {
+            if (stableData === lastUsersData) {
                 isPolling = false;
                 return;
             }
 
             var isFirstLoad = (lastUsersData === '');
-            lastUsersData = newData;
+            lastUsersData = stableData;
 
             var container = document.getElementById('result');
             var serverIds = data.map(function(u) { return u.id; });
