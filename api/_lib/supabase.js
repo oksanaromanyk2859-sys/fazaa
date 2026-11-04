@@ -2,10 +2,19 @@ const { createClient } = require('@supabase/supabase-js');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+let _supabase;
+function getSupabase() {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.SUPABASE_URL || '',
+      process.env.SUPABASE_KEY || ''
+    );
+  }
+  return _supabase;
+}
+const supabase = new Proxy({}, {
+  get: (_, prop) => getSupabase()[prop]
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fazaa-secret-key-2026';
 
