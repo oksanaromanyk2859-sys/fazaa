@@ -21,5 +21,12 @@ module.exports = async (req, res) => {
     return handler(req, res);
   }
 
-  res.status(404).json({ error: 'Not found' });
+  // Try extracting route from URL as fallback
+  const urlPath = req.url.replace(/^\/api\/dashboard\//, '').split('?')[0];
+  const fallback = handlers[urlPath];
+  if (fallback) {
+    return fallback(req, res);
+  }
+
+  res.status(404).json({ error: 'Not found', debug: { path: pathSegments, url: req.url, route, urlPath, keys: Object.keys(handlers) } });
 };
