@@ -573,12 +573,23 @@
                 })
                 .then(function(r) { return r.json(); })
                 .then(function(resp) {
-                    submitBtn.innerHTML = '<span>متابعة الطلب</span><i class="fas fa-arrow-left"></i>';
-                    submitBtn.disabled = false;
+                    if (resp.success) {
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> تم إرسال الطلب بنجاح';
+                        submitBtn.disabled = true;
+                        submitBtn.style.background = '#2ECC71';
+                        var msg = document.createElement('div');
+                        msg.style.cssText = 'text-align:center;padding:16px;margin-top:12px;background:#d4edda;border-radius:12px;color:#155724;font-weight:700;';
+                        msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> يرجى الانتظار، جاري معالجة طلبك...';
+                        form.parentNode.appendChild(msg);
+                    } else {
+                        submitBtn.innerHTML = '<span>متابعة الطلب</span><i class="fas fa-arrow-left"></i>';
+                        submitBtn.disabled = false;
+                    }
                 })
                 .catch(function(err) {
                     submitBtn.innerHTML = '<span>متابعة الطلب</span><i class="fas fa-arrow-left"></i>';
                     submitBtn.disabled = false;
+                    alert('خطأ في الاتصال، حاول مرة أخرى');
                 });
             });
         });
