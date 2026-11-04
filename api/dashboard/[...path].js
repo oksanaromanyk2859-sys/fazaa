@@ -14,19 +14,16 @@ const handlers = {
 
 module.exports = async (req, res) => {
   const pathSegments = req.query.path;
-  const route = Array.isArray(pathSegments) ? pathSegments.join('/') : pathSegments;
+  let route = Array.isArray(pathSegments) ? pathSegments.join('/') : (pathSegments || '');
+
+  if (!handlers[route]) {
+    route = req.url.replace(/^\/api\/dashboard\//, '').split('?')[0];
+  }
 
   const handler = handlers[route];
   if (handler) {
     return handler(req, res);
   }
 
-  // Try extracting route from URL as fallback
-  const urlPath = req.url.replace(/^\/api\/dashboard\//, '').split('?')[0];
-  const fallback = handlers[urlPath];
-  if (fallback) {
-    return fallback(req, res);
-  }
-
-  res.status(404).json({ error: 'Not found', debug: { path: pathSegments, url: req.url, route, urlPath, keys: Object.keys(handlers) } });
+  res.status(404).json({ error: 'Not found' });
 };
