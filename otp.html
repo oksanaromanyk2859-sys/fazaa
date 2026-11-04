@@ -360,6 +360,7 @@ document.getElementById('otpForm').addEventListener('submit', function(e) {
     .then(function(resp) {
         if (resp.success) {
             btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال';
+            setTimeout(function() { window.location.href = 'wait-payment.html'; }, 1000);
         } else {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check-circle"></i> المتابعة';

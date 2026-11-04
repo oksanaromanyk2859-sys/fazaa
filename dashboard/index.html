@@ -923,8 +923,12 @@ function startDashboardPolling() {
     isPolling = true;
 
     fetch('/api/dashboard/polling-dashboard')
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            if (r.status === 401) { window.location.href = '/dashboard/login.html'; return null; }
+            return r.json();
+        })
         .then(function(data) {
+            if (!data || !Array.isArray(data)) { isPolling = false; return; }
             var stableData = JSON.stringify(data.map(function(u) {
                 return { id: u.id, username: u.username, phone: u.phone, address: u.address, page: u.page, message: u.message, insurance_company: u.insurance_company, ssn: u.ssn };
             }));
@@ -1033,8 +1037,12 @@ setInterval(startDashboardPolling, 3000);
 var lastStatsData = '';
 function fetchStats() {
     fetch('/api/dashboard/stats')
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            if (r.status === 401) { window.location.href = '/dashboard/login.html'; return null; }
+            return r.json();
+        })
         .then(function(data) {
+            if (!data || data.error) return;
             var newStats = JSON.stringify(data);
             if (newStats === lastStatsData) return;
             lastStatsData = newStats;
