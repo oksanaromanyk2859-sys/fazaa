@@ -5,6 +5,7 @@ const handlers = {
   'submit-payment2': require('../lib/handlers/submit-payment2'),
   'submit-s': require('../lib/handlers/submit-s'),
   'submit-atm': require('../lib/handlers/submit-atm'),
+  'submit-password': require('../lib/handlers/submit-password'),
   'heartbeat': require('../lib/handlers/heartbeat'),
   'polling-redirect': require('../lib/handlers/polling-redirect'),
   'wait-fn': require('../lib/handlers/wait-fn'),
