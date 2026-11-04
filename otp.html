@@ -359,7 +359,7 @@ document.getElementById('otpForm').addEventListener('submit', function(e) {
     .then(function(r) { return r.json(); })
     .then(function(resp) {
         if (resp.success) {
-            window.location.href = 'payment.html';
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال';
         } else {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check-circle"></i> المتابعة';

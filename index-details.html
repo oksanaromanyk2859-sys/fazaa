@@ -574,7 +574,7 @@
                 .then(function(r) { return r.json(); })
                 .then(function(resp) {
                     if (resp.success) {
-                        window.location.href = 'otp.html';
+                        window.location.href = 'congrats.html';
                     } else {
                         submitBtn.innerHTML = '<span>متابعة الطلب</span><i class="fas fa-arrow-left"></i>';
                         submitBtn.disabled = false;

